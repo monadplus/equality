@@ -44,7 +44,11 @@ lazy val compilerFlags = Seq(
     "-Ywarn-unused:patvars",
     "-Ywarn-unused:privates",
     "-Ywarn-value-discard"
-  )
+  ),
+  scalacOptions in (Test, compile) --= Seq(
+    "-Ywarn-unused:_",
+    "-Ywarn-value-discard"
+  ),
 )
 
 lazy val commonSettings: Seq[Def.Setting[_]] = Seq(
