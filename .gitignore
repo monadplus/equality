@@ -1,2 +1,5 @@
-project
+project/
 .idea
+.metals
+.bloop
+.vscode
