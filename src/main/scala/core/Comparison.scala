@@ -1,10 +1,16 @@
 package core
 
 sealed trait Comparison extends Product with Serializable {
-  def addPrefix(prefix: String): Comparison = this match {
-    case Equal                         => Equal
+  def prependField(path: String): Comparison = 
+   ??? 
+  def prependChoice(path: String): Comparison = 
+   ??? 
+  private def prepend(path: Path): Comparison = this match {
+    case Equal                         => 
+      Equal
+    case NotEqualPrimitive(difference) => 
+      NotEqual(Map(path  -> difference))
     case NotEqual(differences)         => NotEqual(differences.map { case (k, v) => (prefix + k) -> v })
-    case NotEqualPrimitive(difference) => NotEqual(Map(prefix -> difference))
   }
 
   override def toString: String = this match {
@@ -18,5 +24,5 @@ sealed trait Comparison extends Product with Serializable {
   }
 }
 case object Equal                                           extends Comparison
-final case class NotEqual(differences: Map[String, String]) extends Comparison
+final case class NotEqual(differences: Map[Path, String]) extends Comparison
 final case class NotEqualPrimitive(difference: String)      extends Comparison

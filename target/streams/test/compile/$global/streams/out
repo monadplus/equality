@@ -1,4 +1,0 @@
-[0m[[0m[31merror[0m] [0m[0m/Users/arnau/IdeaProjects/equality/src/test/scala/core/ProductSpec.scala:21:11: discarded non-Unit value[0m
-[0m[[0m[31merror[0m] [0m[0m        Eq[AllPrimitives][0m
-[0m[[0m[31merror[0m] [0m[0m          ^[0m
-[0m[[0m[31merror[0m] [0m[0mone error found[0m

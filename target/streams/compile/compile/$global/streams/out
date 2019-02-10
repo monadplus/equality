@@ -1,4 +1,0 @@
-[0m[[0m[31merror[0m] [0m[0m/Users/arnau/IdeaProjects/equality/src/main/scala/Equality.scala:1:18: Unused import[0m
-[0m[[0m[31merror[0m] [0m[0mimport cats.data.Reader[0m
-[0m[[0m[31merror[0m] [0m[0m                 ^[0m
-[0m[[0m[31merror[0m] [0m[0mone error found[0m

@@ -46,8 +46,7 @@ lazy val compilerFlags = Seq(
     "-Ywarn-value-discard"
   ),
   scalacOptions in (Test, compile) --= Seq(
-    "-Ywarn-unused:_",
-    "-Ywarn-value-discard"
+    "-Xfatal-warnings"
   ),
 )
 

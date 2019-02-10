@@ -29,24 +29,17 @@ object Eq {
   implicit val hnilEq: Eq[HNil] =
     Eq.unit[HNil]
 
-  implicit def hlistEq[H, K <: Symbol, T <: HList](implicit
-                                                   witness: Witness.Aux[K],
-                                                   hEq: Lazy[Eq[H]],
-                                                   tEq: Eq[T]): Eq[FieldType[K, H] :: T] =
+  implicit def hlistEq[H, K <: Symbol, T <: HList](
+    implicit
+    witness: Witness.Aux[K],
+    hEq: Lazy[Eq[H]],
+    tEq: Eq[T]
+  ): Eq[FieldType[K, H] :: T] =
     instance {
       case (l, r) =>
         val fieldName = witness.value.name
-        val head = hEq.value.compare(l.head, r.head) match {
-          case Equal =>
-            Equal
-          // TODO: si no es primitiu afegir un nivell de profundidad
-          case primitive: NotEqualPrimitive =>
-            primitive.addPrefix(fieldName)
-          case _ =>
-            // TODO: aqui pot ser primitiu, no afegir profunditat
-            throw new Exception("Inconceivable")
-        }
-        val tail = tEq.compare(l.tail, r.tail).addPrefix(fieldName)
+        val head      = hEq.value.compare(l.head, r.head).prependField(fieldName)
+        val tail      = tEq.compare(l.tail, r.tail)
         (head, tail) match {
           case (Equal, y)                   => y
           case (x, Equal)                   => x
@@ -58,20 +51,24 @@ object Eq {
   implicit val cnilEq: Eq[CNil] =
     instance { case (_, _) => throw new Exception("Inconceivable") }
 
-  implicit def coproductEq[H, K <: Symbol, T <: Coproduct](implicit
-                                                           witness: Witness.Aux[K],
-                                                           hEq: Lazy[Eq[H]],
-                                                           tEq: Eq[T]): Eq[FieldType[K, H] :+: T] = {
+  implicit def coproductEq[H, K <: Symbol, T <: Coproduct](
+    implicit
+    witness: Witness.Aux[K],
+    hEq: Lazy[Eq[H]],
+    tEq: Eq[T]
+  ): Eq[FieldType[K, H] :+: T] = {
     val fieldName = witness.value.name
     instance {
       case (Inl(h), Inl(h2)) =>
-        hEq.value.compare(h, h2).addPrefix(fieldName)
+        hEq.value.compare(h, h2).prependChoice(fieldName)
       case (Inr(t), Inr(t2)) =>
-        tEq.compare(t, t2).addPrefix(fieldName)
-      case (Inl(l), Inr(r)) =>
-        NotEqualPrimitive(s"Expected: ${l.getClass} but found ${r.getClass}")
-      case (Inr(l), Inl(r)) =>
-        NotEqualPrimitive(s"Expected: ${l.getClass} but found ${r.getClass}")
+        tEq.compare(t, t2).prependChoice(fieldName)
+      case (Inl(l), Inr(Inl(r))) =>
+        NotEqualPrimitive(s"${l.getClass.getSimpleName} expected but found ${r.getClass.getSimpleName}")
+      case (Inr(Inl(l)), Inl(r)) =>
+        NotEqualPrimitive(s"${l.getClass.getSimpleName} expected but found ${r.getClass.getSimpleName}")
+      case _ =>
+        throw new Exception("Inconceivable")
     }
   }
 
