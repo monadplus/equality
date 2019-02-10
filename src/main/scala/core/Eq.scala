@@ -62,11 +62,11 @@ object Eq {
       case (Inl(h), Inl(h2)) =>
         hEq.value.compare(h, h2).prependChoice(fieldName)
       case (Inr(t), Inr(t2)) =>
-        tEq.compare(t, t2).prependChoice(fieldName)
+        tEq.compare(t, t2)
       case (Inl(l), Inr(Inl(r))) =>
-        NotEqualPrimitive(s"${l.getClass.getSimpleName} expected but found ${r.getClass.getSimpleName}")
+        NotEqualPrimitive(s"${l.getClass.getSimpleName} expected but ${r.getClass.getSimpleName} found")
       case (Inr(Inl(l)), Inl(r)) =>
-        NotEqualPrimitive(s"${l.getClass.getSimpleName} expected but found ${r.getClass.getSimpleName}")
+        NotEqualPrimitive(s"${l.getClass.getSimpleName} expected but ${r.getClass.getSimpleName} found")
       case _ =>
         throw new Exception("Inconceivable")
     }

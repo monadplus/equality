@@ -25,8 +25,8 @@ class ProductSpec extends FreeSpec {
       assert(
         result == NotEqual(
           Map(
-            "name" -> "Max not equal to Bella",
-            "age"  -> "10 not equal to 8"
+            Field("name", End) -> "Max not equal to Bella",
+            Field("age", End)  -> "10 not equal to 8"
           )
         )
       )
