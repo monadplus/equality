@@ -1,4 +1,0 @@
-- Tut: exemple amb case class amb un camp coproducte
-       exemple extendre les teves propies estructures de dades: NonEmptyList
-- Derivacio case object
-- Import un unic objecte amb tot

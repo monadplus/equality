@@ -79,7 +79,6 @@ class ADTSpec extends FreeSpec {
         val result0 = instance0 ==== instance1 
         val result1 = instance0 ==== instance2
         val result2 = instance3 ==== instance4
-        
         val expected0 = NotEqual(Map(
           Field("bool", End) -> "true not equal to false",
           Field("de", Choice("E", Field("gh", End))) -> "G expected but H found",

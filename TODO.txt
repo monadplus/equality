@@ -1,0 +1,27 @@
+- Tut: exemple amb case class amb un camp coproducte
+       exemple extendre les teves propies estructures de dades: NonEmptyList
+- Derivacio case object
+- Import un unic objecte amb tot
+
+
+Future releases: 
+
+    - Version 0.1: 
+    root (Dog)
+        └── a (A) 
+            └── a1 (String)
+
+    root (Dog)
+        └── a (A) 
+            └──  a2 (C)
+                    └──  c1 (Boolean)             
+
+    - Version 0.2:
+
+    ✕ root (Dog)
+        ├── ✕ a (A) 
+        │      ├── ✔ a1 (String)
+        │      └── ✕ a2 (C)
+        │              └── ✕ c1 (Boolean)
+        └── ✔ b (B)
+                └── ✔ b1 (String)
