@@ -1,22 +1,14 @@
+- Import un unic objecte amb tot
 - Tut: exemple amb case class amb un camp coproducte
        exemple extendre les teves propies estructures de dades: NonEmptyList
-- Derivacio case object
-- Import un unic objecte amb tot
+- travis
+- Code coverage
+- Deploy using travis
 
+Future releases (0.2): 
 
-Future releases: 
-
-    - Version 0.1: 
-    root (Dog)
-        └── a (A) 
-            └── a1 (String)
-
-    root (Dog)
-        └── a (A) 
-            └──  a2 (C)
-                    └──  c1 (Boolean)             
-
-    - Version 0.2:
+    - Eq returns a tree structure with all the path
+      and a better visualization
 
     ✕ root (Dog)
         ├── ✕ a (A) 
@@ -25,3 +17,5 @@ Future releases:
         │              └── ✕ c1 (Boolean)
         └── ✔ b (B)
                 └── ✔ b1 (String)
+
+    - Mima checks            

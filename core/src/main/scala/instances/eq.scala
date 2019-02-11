@@ -76,8 +76,26 @@ sealed trait EqStdInstances {
       }
   }
 
-  implicit def mapEq[K, V: Eq]: Eq[Map[K, V]] = 
-  ???
+  implicit def mapEq[K, V: Eq]: Eq[Map[K, V]] = instance {
+    case (l, r) =>
+      val lKeys = l.keySet
+      val rKeys = r.keySet
+      val leftDiff = lKeys diff rKeys
+      if (leftDiff.isEmpty) {
+        val rightDiff = rKeys diff lKeys
+        if (rightDiff.isEmpty) {
+          lKeys.foldLeft[Comparison](Equal) {
+            case (acc, key) => 
+              val next = (l(key) ==== r(key)).prependKey(key.toString)
+              acc.combine(next)
+          }
+        } else {
+          NotEqualPrimitive(s"""Left map does not contain keys: ${rightDiff.mkString(",")}""")
+        }
+      } else {
+        NotEqualPrimitive(s"""Right map does not contain keys: ${leftDiff.mkString(",")}""")
+      }
+  }
 }
 
 object eq extends EqPrimitivesTypes with EqStdInstances

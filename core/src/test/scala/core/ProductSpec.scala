@@ -5,11 +5,21 @@ import org.scalatest.FreeSpec
 import instances.eq._
 import syntax.eq._
 
-case class AllPrimitives(x: Double, x1: Float, x2: Long, x3: Int, x4: Short, x5: Byte, x6: Unit, x7: Boolean, x8: Char)
-
-case class Dog(name: String, age: Int)
-
 class ProductSpec extends FreeSpec {
+
+  case class AllPrimitives(
+    x: Double,
+    x1: Float,
+    x2: Long,
+    x3: Int,
+    x4: Short,
+    x5: Byte,
+    x6: Unit,
+    x7: Boolean,
+    x8: Char
+  )
+
+  case class Dog(name: String, age: Int)
 
   "Eq on a product data type" - {
     "returns Equal when both instances are equal" in {

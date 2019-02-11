@@ -21,9 +21,9 @@ class ComparisonSpec extends FreeSpec {
           ))
           val expected: String = s"""root
           |  └── x1 (A)
-          |          └── xs (0) FAILED
+          |          └── xs (idx: 0) FAILED
           |
-          |1 did not equal to 0""".stripMargin
+          |      1 did not equal to 0""".stripMargin
           assert(comp.toString === expected)
 
           val comp2: Comparison = NotEqual(Map(
@@ -43,11 +43,20 @@ class ComparisonSpec extends FreeSpec {
           |C expected but found D
           |
           |root
-          |  └── x3 (0)
-          |          └── y1 FAILED
+          |  └── x3 (idx: 0)
+          |               └── y1 FAILED
           |
-          |asdf did not equal asd""".stripMargin
+          |   asdf did not equal asd""".stripMargin
           assert(comp2.toString === expected2)
+
+          val comp3: Comparison = NotEqual(Map(
+            Field("x1", Index(0, InSet(Key("blue", End)))) -> "Blue expected but Red found"
+          ))
+          val expected3: String = s"""root
+          |  └── x1 (idx: 0) (set) (key: blue) FAILED
+          |
+          |       Blue expected but Red found""".stripMargin
+          assert(comp3.toString === expected3)
         }
     }
 }

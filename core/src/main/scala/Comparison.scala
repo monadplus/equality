@@ -1,6 +1,7 @@
 package core
 
 import cats.implicits._
+
 sealed trait Comparison extends Product with Serializable {
   private[core] def prependField(fieldName: String): Comparison =
     prepend(Field(fieldName, _))
@@ -71,25 +72,25 @@ sealed trait Comparison extends Product with Serializable {
         acc + "\n\n" + (" " * spaces) + error
       case Field(name, next) =>
         val offset  = 2
-        val postfix = "└── " + name
-        val text    = acc + "\n" + (" " * (width - offset)) + postfix + addEnd(next)
+        val postfix = "└── " + name + addEnd(next)
+        val text    = acc + "\n" + (" " * (width - offset)) + postfix
         val w       = Math.max(0, width + postfix.length - offset)
         loop(w, next, text)
       case Choice(name, next) =>
-        val postfix = " (" + name + ")"
-        val text    = acc + postfix + addEnd(next)
+        val postfix = " (" + name + ")" + addEnd(next)
+        val text    = acc + postfix
         loop(width + postfix.length, next, text)
       case Index(index, next) =>
-        val postfix = " (" + index.toString + ")"
-        val text    = acc + postfix + addEnd(next)
+        val postfix = " (idx: " + index.toString + ")" + addEnd(next)
+        val text    = acc + postfix
         loop(width + postfix.length, next, text)
       case InSet(next) =>
-        val postfix = " (Set)"
-        val text    = acc + postfix + addEnd(next)
+        val postfix = " (set)" + addEnd(next)
+        val text    = acc + postfix
         loop(width + postfix.length, next, text)
       case Key(k, next) =>
-        val postfix = " (" + k + ")"
-        val text    = acc + postfix + addEnd(next)
+        val postfix = " (key: " + k + ")"  + addEnd(next)
+        val text    = acc + postfix
         loop(width + postfix.length, next, text)
     }
 

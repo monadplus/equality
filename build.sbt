@@ -2,14 +2,14 @@ resolvers in Global += Resolver.sonatypeRepo("releases")
 
 publishMavenStyle := false
 
-lazy val shapelessVersion     = "2.3.3"
-lazy val catsVersion          = "1.5.0"
-lazy val scalaTestVersion     = "3.0.5"
+lazy val shapelessVersion = "2.3.3"
+lazy val catsVersion      = "1.6.0"
+lazy val scalaTestVersion = "3.0.5"
 
 lazy val commonDependencies = Seq(
   "com.chuusai"   %% "shapeless" % shapelessVersion,
   "org.typelevel" %% "cats-core" % catsVersion,
-  "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
+  "org.scalatest" %% "scalatest" % scalaTestVersion,
   "org.scalactic" %% "scalactic" % scalaTestVersion % Test
 )
 
@@ -27,7 +27,6 @@ lazy val compilerFlags = Seq(
     "-Xcheckinit",
     "-Xfatal-warnings",
     "-Xfuture",
-    "-Xlint:_",
     "-Yno-adapted-args",
     "-Ypartial-unification",
     "-Ywarn-dead-code",
@@ -47,7 +46,7 @@ lazy val compilerFlags = Seq(
   ),
   scalacOptions in (Test, compile) --= Seq(
     "-Xfatal-warnings"
-  ),
+  )
 )
 
 lazy val commonSettings: Seq[Def.Setting[_]] = Seq(
@@ -58,9 +57,20 @@ lazy val commonSettings: Seq[Def.Setting[_]] = Seq(
   licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.html")),
   parallelExecution in Test := true,
   fork in Test := true,
-  libraryDependencies ++= commonDependencies,
+  libraryDependencies ++= commonDependencies
 ) ++ compilerFlags
 
-lazy val root = project
-  .in(file("."))
+lazy val equality = project.in(file("."))
+  .aggregate(
+    core,
+    docs
+  )
   .settings(commonSettings: _*)
+
+lazy val core = project.in(file("core"))
+  .settings(commonSettings: _*)
+  .settings(name := "equality-core")
+
+  lazy val docs = project.in(file("docs"))
+  .settings(commonSettings: _*)
+  .dependsOn(core)
