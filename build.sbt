@@ -1,7 +1,5 @@
 resolvers in Global += Resolver.sonatypeRepo("releases")
 
-publishMavenStyle := false
-
 lazy val shapelessVersion = "2.3.3"
 lazy val catsVersion      = "1.6.0"
 lazy val scalaTestVersion = "3.0.5"
@@ -23,6 +21,7 @@ lazy val compilerFlags = Seq(
     "-language:existentials",
     "-language:higherKinds",
     "-language:implicitConversions",
+    "-deprecation",
     "-unchecked",
     "-Xcheckinit",
     "-Xfatal-warnings",
@@ -50,9 +49,8 @@ lazy val compilerFlags = Seq(
 )
 
 lazy val commonSettings: Seq[Def.Setting[_]] = Seq(
-  organization := "monadplus",
+  organization := "io.monadplus",
   name := "equality",
-  version := "0.0.1",
   scalaVersion := "2.12.8",
   licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.html")),
   parallelExecution in Test := true,
@@ -60,17 +58,47 @@ lazy val commonSettings: Seq[Def.Setting[_]] = Seq(
   libraryDependencies ++= commonDependencies
 ) ++ compilerFlags
 
-lazy val equality = project.in(file("."))
+lazy val publishSettings =
+  Seq(
+    bintrayOrganization := Some("io-monadplus"),
+    bintrayPackage := "equality"
+  )
+
+lazy val noPublishSettings =
+  Seq(
+    skip in publish := true
+  )
+
+lazy val coverageSettings = 
+  Seq(
+    coverageMinimum := 70,
+    coverageHighlighting := true,
+    coverageFailOnMinimum := true
+  )
+
+lazy val equality = project
+  .in(file("."))
   .aggregate(
     core,
     docs
   )
-  .settings(commonSettings: _*)
+  .settings(commonSettings)
+  .settings(noPublishSettings)
+  .settings(coverageSettings)
 
-lazy val core = project.in(file("core"))
-  .settings(commonSettings: _*)
+lazy val core = project
+  .in(file("core"))
+  .settings(commonSettings)
+  .settings(publishSettings)
+  .settings(coverageSettings)
   .settings(name := "equality-core")
 
-  lazy val docs = project.in(file("docs"))
-  .settings(commonSettings: _*)
+lazy val docs = project
+  .in(file("docs"))
+  .settings(commonSettings)
+  .settings(noPublishSettings)
+  .settings(
+    skip in publish := true
+  )
+  .enablePlugins(TutPlugin)
   .dependsOn(core)

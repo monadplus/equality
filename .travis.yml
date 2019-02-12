@@ -7,14 +7,19 @@ scala:
 jdk:
 - oraclejdk8
 
+before_cache:
+  - find $HOME/.sbt -name "*.lock" -type f -delete
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
+
 cache:
   directories:
   - $HOME/.ivy2/cache
   - $HOME/.sbt
+  - $HOME/.coursier/cache
 
-jobs:
-  include:
-  - stage: verify
+script:
+  - sbt coverage "++$TRAVIS_SCALA_VERSION test" 
 
-    script:
-    - sbt ++$TRAVIS_SCALA_VERSION test
+after_success:
+  - sbt ++$TRAVIS_SCALA_VERSION "++$TRAVIS_SCALA_VERSION coverageReport" coverageAggregate codacyCoverage
+  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $TRAVIS_REPO_SLUG == "monadplus/equality" && sbt ++$TRAVIS_SCALA_VERSION publish

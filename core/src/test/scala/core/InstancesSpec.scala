@@ -88,6 +88,21 @@ class InstancesSpec extends FreeSpec {
     }
   }
 
+  "NonEmptyList" - {
+    "should compare nonEmptyList" in {
+      import cats.data.NonEmptyList
+
+      val nel1: NonEmptyList[Char] = NonEmptyList.of('a', 'b', 'c')
+      val nel2: NonEmptyList[Char] = NonEmptyList.of('a', 'b', 'd')
+
+      val result1 = nel1 ==== nel1
+      assert(result1 === Equal)
+
+      val result2 = nel1 ==== nel2
+      assert(result2 === NotEqual(Map(Field("tail", Index(1, End)) -> "c not equal to d")))
+    }
+  }
+
   "Tuple" - {
     // TupleN it's just an ordinary case class
     "should resole an instance of Eq for 2-arity tuples" in {

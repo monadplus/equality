@@ -1,5 +1,68 @@
----
-layout: home
+# Equality
+## Project Goals
+In the past, comparing instances with scalatest `===` has been a nuisance. Triple equal output must be compared by hand with an external tool which slows down your project development.
 
----
-#TODO
+Equality brings a better triple equals in the form of `===!` which prints, in case of error, a tree representation of the divergence between the compared values. 
+## Quick Start
+To use equality in an existing SBT project with Scala 2.12, add the following dependency to your `build.sbt`:
+```scala
+resolvers += Resolver.bintrayRepo("io-monadplus", "maven")
+
+libraryDependencies += "io.monadplus" %% "equality-core" % "0.1"
+```
+## Example
+Equality is thought to be used with [scalatest](http://www.scalatest.org/) for testing
+```tut
+import org.scalatest.FreeSpec
+import core.all._
+
+class Example extends FreeSpec {
+  "Given an arbitrary ADT" - {
+    "should compare two instances" in {
+      
+      sealed trait XY
+      case class X(x: Option[List[Int]]) extends XY
+      case class Y(bool: Boolean) extends XY
+      case class Z(z: XY)
+
+      val z0 = Z(z = X(Some(List(1,2,3))))
+      val z1 = Z(z = X(Some(List(1,2,2))))
+
+      z0 ===! z1
+    }
+  }
+```
+## Create your own instances
+Equality is powered by [shapeless](https://github.com/milessabin/shapeless) for type class derivation of arbitrary ADTs. Equality can derivate instances of products (case classes) and coproducts (sealed traits + subclasses) of any combination of primitive type. It also supports scala's std collection like Option, List, Vector, Map, Set, et cetera.
+
+Furthermore, a user can define its own instances in case of need. 
+
+In this example we are going to create an instance for [NonEmptyList](https://github.com/typelevel/cats/blob/master/core/src/main/scala/cats/data/NonEmptyList.scala)*
+```tut
+import core.all._
+
+implicit def nonEmptyListEq[A: Eq]: Eq[NonEmptyList[A]] = new Eq[NonEmptyList[A]] {
+    override def compare(x: NonEmptyList[A], y: NonEmptyList[A]) = {
+      val head = (x.head ==== y.head).prependField("head")
+      val tail = (x.tail ==== y.tail).prependField("tail")
+      head.combine(tail)
+    }
+}
+```
+*Actually, there is no need for this particular instance as equality is clever enough to auto-derivate it.
+## Future Releases
+
+__Release 0.2__  
+ - Microsite
+ - Mima checks for binary compatibility
+ - Better visualization
+```text
+✕ root (Dog)
+    ├── ✕ a (A) 
+    │      ├── ✔ a1 (String)
+    │      └── ✕ a2 (C)
+    │              └── ✕ c1 (Boolean)
+    └── ✔ b (B)
+            └── ✔ b1 (String)
+
+```

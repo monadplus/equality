@@ -1,8 +1,7 @@
 package core
 
 import org.scalatest.FreeSpec
-import instances.eq._
-import syntax.eq._
+import all._
 
 class ADTSpec extends FreeSpec {
 

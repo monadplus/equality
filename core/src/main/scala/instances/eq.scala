@@ -4,7 +4,7 @@ import core._
 import core.Eq._
 import syntax.eq._
 
-sealed trait EqPrimitivesTypes {
+private[core] trait EqInstances0 extends EqInstances1 {
   implicit val stringEq: Eq[String] = instance {
     case (s1, s2) =>
       if (s1 == s2) Equal else NotEqualPrimitive(s"$s1 not equal to $s2")
@@ -16,7 +16,7 @@ sealed trait EqPrimitivesTypes {
   }
 }
 
-sealed trait EqStdInstances {
+private[core] sealed trait EqInstances1 {
   implicit def optionEq[A: Eq]: Eq[Option[A]] = instance {
     case (None, None)         => Equal
     case (None, some)         => NotEqualPrimitive(s"None not equal to $some")
@@ -61,6 +61,15 @@ sealed trait EqStdInstances {
         }
   }
 
+  // import cats.data._
+  // implicit def nonEmptyListEq[A: Eq]: Eq[NonEmptyList[A]] = new Eq[NonEmptyList[A]] {
+  //   override def compare(x: NonEmptyList[A], y: NonEmptyList[A]) = {
+  //     val head = (x.head ==== y.head).prependField("head")
+  //     val tail = (x.tail ==== y.tail).prependField("tail")
+  //     head.combine(tail)
+  //   }
+  // }
+
   implicit def setEq[A: Eq]: Eq[Set[A]] = instance {
     case (l, r) =>
       val leftDiff = l.diff(r)
@@ -98,4 +107,4 @@ sealed trait EqStdInstances {
   }
 }
 
-object eq extends EqPrimitivesTypes with EqStdInstances
+object eq extends EqInstances0
