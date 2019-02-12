@@ -1,6 +1,5 @@
 # Equality 
-[![Travis CI](https://travis-ci.org/monadplus/equality.svg?branch=master)](https://travis-ci.org/monadplus/equality) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f01edd87fcfe45fd9c7bd6e44b64e5ae)](https://app.codacy.com/app/monadplus/equality?utm_source=github.com&utm_medium=referral&utm_content=monadplus/equality&utm_campaign=Badge_Grade_Dashboard)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/554261fd76634affb7f40b54f8b8583a)](https://www.codacy.com/app/monadplus/equality?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=monadplus/equality&amp;utm_campaign=Badge_Coverage)
+[![Travis CI](https://travis-ci.org/monadplus/equality.svg?branch=master)](https://travis-ci.org/monadplus/equality) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f01edd87fcfe45fd9c7bd6e44b64e5ae)](https://app.codacy.com/app/monadplus/equality?utm_source=github.com&utm_medium=referral&utm_content=monadplus/equality&utm_campaign=Badge_Grade_Dashboard) [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/554261fd76634affb7f40b54f8b8583a)](https://www.codacy.com/app/monadplus/equality?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=monadplus/equality&amp;utm_campaign=Badge_Coverage)
 
 ## Project Goals
 In the past, comparing instances with scalatest `===` has been a nuisance. Triple equal output must be compared by hand with an external tool which slows down your project development.

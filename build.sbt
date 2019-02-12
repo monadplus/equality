@@ -60,6 +60,7 @@ lazy val commonSettings: Seq[Def.Setting[_]] = Seq(
 
 lazy val publishSettings =
   Seq(
+    publishMavenStyle := true,  
     bintrayOrganization := Some("io-monadplus"),
     bintrayPackage := "equality"
   )
