@@ -5,12 +5,12 @@ import org.scalatest.FreeSpec
 import instances.eq._
 import syntax.eq._
 
-class CoproductSpec extends FreeSpec {
+sealed trait Shape
+final case class Circle(radius: Long)                 extends Shape
+final case class Rectangle(width: Long, height: Long) extends Shape
+case object Amorph                                 extends Shape
 
-  sealed trait Shape
-  final case class Circle(radius: Long)                 extends Shape
-  final case class Rectangle(width: Long, height: Long) extends Shape
-  case object Amorph                                 extends Shape
+class CoproductSpec extends FreeSpec {
 
   "Eq on a coproduct data type" - {
     "returns Equal when both instances are equal" in {

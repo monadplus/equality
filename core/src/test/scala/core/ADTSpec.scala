@@ -3,22 +3,22 @@ package core
 import org.scalatest.FreeSpec
 import all._
 
+sealed trait GH
+final case class G(double: Double) extends GH
+final case class H(float: Float)   extends GH
+
+sealed trait IJK
+case class I(long: Long) extends IJK
+case class J(long: Long) extends IJK
+case class K(long: Long) extends IJK
+
+sealed trait DE
+final case class D(ijk: IJK)         extends DE
+final case class E(gh: GH, int: Int) extends DE
+
+case class ABC(bool: Boolean, de: DE)
+
 class ADTSpec extends FreeSpec {
-
-  sealed trait GH
-  final case class G(double: Double) extends GH
-  final case class H(float: Float)   extends GH
-
-  sealed trait IJK
-  case class I(long: Long) extends IJK
-  case class J(long: Long) extends IJK
-  case class K(long: Long) extends IJK
-
-  sealed trait DE
-  final case class D(ijk: IJK)         extends DE
-  final case class E(gh: GH, int: Int) extends DE
-
-  case class ABC(bool: Boolean, de: DE)
 
   val instance0 = ABC(
     bool = true,
