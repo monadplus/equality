@@ -1,0 +1,21 @@
+sealed trait DE
+  final case class D(ijk: IJK)         extends DE
+  final case class E(gh: GH, int: Int) extends DE
+
+  case class ABC(bool: Boolean, de: DE)
+
+
+[Node: ijk, ok] 
+[
+
+ - Get Root class from ==== this :)
+
+ ✕ Dog
+     ├── ✕ breed: Chihuahua
+     │                  ├── ✔ hasPedigree: Boolean
+     │                  ├── ✔ color: Brown
+     │                  └── ✕ state: String [California did not equal to Louisiana]
+     │
+     └── ✔ owner: Owner
+                    ├── ✔ name: String
+                    └── ✔ age: Int

@@ -2,6 +2,7 @@ package core
 
 import cats.implicits._
 
+
 sealed trait Comparison extends Product with Serializable {
   private[core] def prependField(fieldName: String): Comparison =
     prepend(Field(fieldName, _))
@@ -105,3 +106,4 @@ final case class NotEqualPrimitive(difference: String)    extends Comparison
 
 sealed trait PrintConfig
 case object TreeStructure extends PrintConfig
+
