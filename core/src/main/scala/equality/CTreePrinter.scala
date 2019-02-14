@@ -1,16 +1,5 @@
 package equality
 
-// Output example:
-//
-// ✕ Dog
-//     ├── ✕ breed: Chihuahua
-//     │                  ├── ✔ hasPedigree: Boolean
-//     │                  ├── ✔ color: Brown
-//     │                  └── ✕ state: String [California did not equal to Louisiana]
-//     └── ✔ owner: Owner
-//                    ├── ✔ name: String
-//                    └── ✔ age: Int
-
 object CTreePrinter {
   type Matrix = Map[Int, List[Char]]
   type Fields = List[(String, CTree)]
@@ -29,7 +18,7 @@ object CTreePrinter {
 
   def print(ct: CTree): String = {
 
-    def tree(curr: Matrix, fields: Fields, height: Int, width: Int, fromNamed: Boolean = false): (Matrix, Int) = {
+    def tree(curr: Matrix, fields: Fields, height: Int, width: Int): (Matrix, Int) = {
       val prefix      = (idx: Int) => if (idx == fields.length - 1) "└──" else "├──"
       val whitespaces = " " * width
       fields.zipWithIndex.foldLeft[(Matrix, Int)]((curr, height)) {
@@ -37,13 +26,7 @@ object CTreePrinter {
           val height = h + 1 /*next line*/
           val text               = whitespaces ++ s"${prefix(index)} ${mark(field)} $fieldName: "
           val matrix: Matrix     = acc + (height -> text.toList)
-          val (matrix2, height2) =
-            (field, fromNamed) match {
-              case (Named(className, fields), true) =>
-                loop(Unnamed(fields), addText(matrix, height, className), height, text.length + (className.length / 2))
-              case _ =>
-                loop(field, matrix, height, text.length)
-            }
+          val (matrix2, height2) = loop(field, matrix, height, text.length)
           val matrix3 =
             if (index == fields.length - 1) matrix2
             else {
@@ -62,11 +45,16 @@ object CTreePrinter {
 
     def loop(c: CTree, acc: Matrix, height: Int, width: Int): (Matrix, Int /*branch height*/ ) = c match {
       case Named(className, fields) =>
-        val prefix = s"${mark(c)} "
+        val prefix = if (height == 0) s"${mark(c)} " else ""
         val next = addText(acc, height, prefix ++ className)
-        tree(next, fields, height, width + prefix.length + (className.length / 2), fromNamed = true)
+        tree(next, fields, height, width + prefix.length + (className.length / 2))
       case Unnamed(fields) =>
         tree(acc, fields, height, width)
+      case l@Large(className, _, ne) =>
+        val text: String =
+          if (ne.isEmpty) s"${mark(l)} $className (too large)"
+          else s"${mark(l)} $className (too large: ${ne.length} not equal elements)"
+        addText(acc, height, text) -> height
       case Coproduct(className, c) =>
         val prefix = if (height == 0) mark(c) + " " else ""
         val next   = addText(acc, height, prefix + className)

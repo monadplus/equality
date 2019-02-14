@@ -1,8 +1,8 @@
-package core
+package equality
 
+import equality.all._
 import org.scalatest._
 import scala.util._
-import all._
 
 class AssertionSpec extends FreeSpec {
 

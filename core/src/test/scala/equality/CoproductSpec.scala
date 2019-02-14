@@ -1,12 +1,8 @@
 package equality
 
 import equality.all._
+import equality.util.TestHelper._
 import org.scalatest.FreeSpec
-
-sealed trait Shape
-final case class Circle(radius: Long)                 extends Shape
-final case class Rectangle(width: Long, height: Long) extends Shape
-case object Amorph                                    extends Shape
 
 class CoproductSpec extends FreeSpec {
 

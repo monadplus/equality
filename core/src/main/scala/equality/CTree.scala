@@ -14,6 +14,12 @@ case class Mismatch(reason: String) extends CTree {
   val isEqual: Boolean = false
 }
 
+// To represent data structures like List, Map and Set.
+sealed trait Collection extends CTree with Serializable
+case class Large(className: String, equal: List[(String, CTree)], notEqual: List[(String, CTree)]) extends Collection {
+  val isEqual: Boolean = notEqual.isEmpty
+}
+
 sealed trait Product extends CTree {
   val fields: List[(String, CTree)]
 
@@ -21,7 +27,7 @@ sealed trait Product extends CTree {
     fields.forall(_._2.isEqual)
 }
 case class Unnamed(fields: List[(String, CTree)])                  extends Product
-case class Named(className: String, fields: List[(String, CTree)]) extends Product
+case class Named(className: String, fields: List[(String, CTree)]) extends Product with Collection
 
 case class Coproduct(className: String, tree: CTree) extends CTree {
   override def isEqual: Boolean =
