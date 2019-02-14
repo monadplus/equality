@@ -20,7 +20,7 @@ private[equality] trait EqInstances0 extends EqInstances1{
    implicit def listEq[A: Eq]: Eq[List[A]] = instance {
      case (l, r) =>
        if (l.length != r.length) {
-         Primitive("List", isEqual = false, Some(s"L: ${l.length} R: ${r.length}."))
+         Primitive("List", isEqual = false, Some(s"Left contains ${l.length} elements and right contains ${r.length}"))
        }
        else {
          val res =  l.zip(r).zipWithIndex.foldLeft[Named](Named("List", List.empty)) {

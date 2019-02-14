@@ -50,10 +50,10 @@ object CTreePrinter {
         tree(next, fields, height, width + prefix.length + (className.length / 2))
       case Unnamed(fields) =>
         tree(acc, fields, height, width)
-      case l@Large(className, _, ne) =>
+      case Large(className, _, ne) =>
         val text: String =
-          if (ne.isEmpty) s"${mark(l)} $className (too large)"
-          else s"${mark(l)} $className (too large: ${ne.length} not equal elements)"
+          if (ne.isEmpty) s"$className (too large)"
+          else s"$className (too large: ${ne.length} not equal elements)"
         addText(acc, height, text) -> height
       case Coproduct(className, c) =>
         val prefix = if (height == 0) mark(c) + " " else ""

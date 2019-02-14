@@ -26,9 +26,10 @@ class InstancesSpec extends FreeSpec {
       val list1: List[Int] = Nil
       val list2: List[Int] = (1 to 100).toList
 
-      val result           = list2 ==== list2
-      println(result)
-//      assert(result === NotEqualPrimitive("0 elements expected but 1 found"))
+      val result           = list1 ==== list2
+      val error = "Left contains 0 elements and right contains 100"
+      val expected = equality.Primitive("List", isEqual = false, Some(error))
+      assert(result === expected)
     }
 
     "should compare list of the same size" in {
@@ -38,16 +39,16 @@ class InstancesSpec extends FreeSpec {
       val list2: List[Option[Int]] = List(1.some, none, 3.some, 4.some)
 
       val result                   = list1 ==== list2
-//      assert(
-//        result === NotEqual(
-//          Map(
-//            Index(2, Choice("Some", End)) -> "2 not equal to 3",
-//            Index(3, End)                 -> "None not equal to Some(4)"
-//          )
-//        )
-//      )
+      val expected = Named("List", List(
+        "0" -> Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = true)))),
+        "1" -> Coproduct("None", CUnit),
+        "2" -> Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = false, Some("2 not equal to 3"))))),
+        "3" -> Mismatch("None$ expected but Some found"),
+      ))
+      assert(result === expected)
     }
   }
+//  TODO
 //
 //  "Vector" - {
 //    "should compare vectors of different sizes" in {

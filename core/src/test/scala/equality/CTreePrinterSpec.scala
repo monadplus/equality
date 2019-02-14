@@ -78,7 +78,7 @@ class CTreePrinterSpec extends FreeSpec {
     }
 
     // Value classes are not boxed so the underlying representation it is just
-    // the value they are wrapping (weird behaviour with classname though)
+    // the value they are wrapping (weird behaviour with class name though)
     "should print value classes" in {
       val book = Book("Green Book")
       val book2 = Book("Moby-Dick")
@@ -88,12 +88,13 @@ class CTreePrinterSpec extends FreeSpec {
 
     }
     "should print a List" in {
-      val rest = Restaurant("Mamma mia", List("canelloni", "pizza", "gnoqui", "spaghetti").map(Dish(_, 10.0)))
-//      val rest1 = Restaurant("Good Food", List("sandwitch", "hotdog").map(Dish(_, 2)))
-//      val rest2 = Restaurant("Large", ('a' to 'z').toList.map(_.toString).map(Dish(_, 3)))
-//      val rest3 = Restaurant("Mamma mia", List("canelloni", "pizza", "gnoqui", "farfalle").map(Dish))
+      val rest0 = Restaurant("Mamma mia", List("canelloni", "pizza", "gnoqui", "spaghetti").map(Dish(_, 10.0)))
+      val rest1 = Restaurant("Piazza", List("canelloni", "pizza", "gnoqui", "farfalle").map(Dish(_, 10.0)))
+      val rest2 = Restaurant("Mamma mia", List("sandwitch", "hotdog").map(Dish(_, 2.0)))
+      val rest3 = Restaurant("Large", ('a' to 'z').toList.map(_.toString).map(Dish(_, 3.0)))
+      val rest4 = Restaurant("Large", ('a' to 'z').toList.reverse.map(_.toString).map(Dish(_, 3.0)))
 
-      val result = (rest ==== rest).toString
+      val result = (rest0 ==== rest0).toString
       val expected =
         s"""✔ Restaurant
            |       ├── ✔ name: String
@@ -112,29 +113,45 @@ class CTreePrinterSpec extends FreeSpec {
            |                                └── ✔ price: Double""".stripMargin
       assert(result === expected)
 
-//      val result2 = (rest ==== rest1).toString
-//      val expected2 =
-//        s"""✕ Person
-//           |     ├── ✕ name: String [John not equal to Adam]
-//           |     ├── ✕ contact: Address
-//           |     │                 ├── ✕ number: Integer [24 not equal to 23]
-//           |     │                 └── ✔ street: String
-//           |     └── ✕ dog: Dog
-//           |                 ├── ✕ name: String [Max not equal to Bella]
-//           |                 └── ✔ age: Integer""".stripMargin
-//      assert(result === expected2)
-//
-//      val result3 = (rest2 ==== rest2).toString
-//      val expected3 =
-//        s"""✕ Person
-//           |     ├── ✕ name: String [John not equal to Adam]
-//           |     ├── ✕ contact: Address
-//           |     │                 ├── ✕ number: Integer [24 not equal to 23]
-//           |     │                 └── ✔ street: String
-//           |     └── ✕ dog: Dog
-//           |                 ├── ✕ name: String [Max not equal to Bella]
-//           |                 └── ✔ age: Integer""".stripMargin
-//      assert(result === expected3)
+      val result1 = (rest0 ==== rest1).toString
+      val expected1 =
+        s"""✕ Restaurant
+           |       ├── ✕ name: String [Mamma mia not equal to Piazza]
+           |       └── ✕ menu: List
+           |                     ├── ✔ 0: Dish
+           |                     │          ├── ✔ name: String
+           |                     │          └── ✔ price: Double
+           |                     ├── ✔ 1: Dish
+           |                     │          ├── ✔ name: String
+           |                     │          └── ✔ price: Double
+           |                     ├── ✔ 2: Dish
+           |                     │          ├── ✔ name: String
+           |                     │          └── ✔ price: Double
+           |                     └── ✕ 3: Dish
+           |                                ├── ✕ name: String [spaghetti not equal to farfalle]
+           |                                └── ✔ price: Double""".stripMargin
+      assert(result1 === expected1)
+
+      val result2 = (rest0 ==== rest2).toString
+      val expected2 =
+        s"""✕ Restaurant
+           |       ├── ✔ name: String
+           |       └── ✕ menu: List [Left contains 4 elements and right contains 2]""".stripMargin
+      assert(result2 === expected2)
+
+      val result3 = (rest3 ==== rest3).toString
+      val expected3 =
+        s"""✔ Restaurant
+           |       ├── ✔ name: String
+           |       └── ✔ menu: List (too large)""".stripMargin
+      assert(result3 === expected3)
+
+      val result4 = (rest3 ==== rest4).toString
+      val expected4 =
+        s"""✕ Restaurant
+           |       ├── ✔ name: String
+           |       └── ✕ menu: List (too large: 26 not equal elements)""".stripMargin
+      assert(result4 === expected4)
     }
   }
 }
