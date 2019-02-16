@@ -1,5 +1,7 @@
 package equality
 
+import java.io.File
+
 import org.scalatest.FreeSpec
 import equality.all._
 import equality.util.TestHelper._
@@ -22,7 +24,7 @@ class CTreePrinterSpec extends FreeSpec {
       val expected =
         s"""✕ Address
            |     ├── ✕ number: Integer [24 not equal to 23]
-           |     └── ✔ street: String""".stripMargin
+           |     └── ✔ street: String [Wailmore]""".stripMargin
       assert(result === expected)
     }
 
@@ -37,7 +39,7 @@ class CTreePrinterSpec extends FreeSpec {
       val expected: String =
         s"""✕ Dog
            |   ├── ✕ name: String [Max not equal to Bella]
-           |   └── ✔ age: Integer""".stripMargin
+           |   └── ✔ age: Integer [1]""".stripMargin
       assert(result === expected)
     }
 
@@ -48,10 +50,10 @@ class CTreePrinterSpec extends FreeSpec {
            |     ├── ✕ name: String [John not equal to Adam]
            |     ├── ✕ contact: Address
            |     │                 ├── ✕ number: Integer [24 not equal to 23]
-           |     │                 └── ✔ street: String
+           |     │                 └── ✔ street: String [Wailmore]
            |     └── ✕ dog: Dog
            |                 ├── ✕ name: String [Max not equal to Bella]
-           |                 └── ✔ age: Integer""".stripMargin
+           |                 └── ✔ age: Integer [1]""".stripMargin
       assert(result === expected)
     }
 
@@ -68,49 +70,53 @@ class CTreePrinterSpec extends FreeSpec {
            |  │        │        │        ├── ✕ a: G
            |  │        │        │        │        └── ✕ a: H
            |  │        │        │        │                 └── ✕ a: Boolean [false not equal to true]
-           |  │        │        │        ├── ✔ a1: String
+           |  │        │        │        ├── ✔ a1: String [world]
            |  │        │        │        └── ✕ a2: String [! not equal to !!]
-           |  │        │        ├── ✔ a2: Boolean
+           |  │        │        ├── ✔ a2: Boolean [true]
            |  │        │        └── ✕ a3: Long [100 not equal to 101]
-           |  │        └── ✔ a1: String
+           |  │        └── ✔ a1: String [hello]
            |  └── ✕ a1: Boolean [true not equal to false]""".stripMargin
       assert(result === expected)
     }
 
-    // Value classes are not boxed so the underlying representation it is just
-    // the value they are wrapping (weird behaviour with class name though)
+    // Value classes are not boxed so the underlying representation it is just the value they are wrapping.
     "should print value classes" in {
-      val book = Book("Green Book")
-      val book2 = Book("Moby-Dick")
-      val result = (book ==== book2).toString
-      val expected = "Book [Book(Green Book) not equal to Book(Moby-Dick)]"
+      val book = Book("Odisea")
+      val book1 = Book("Moby-Dick")
+      val book2 = Book(" listen !" * 100)
+
+      val result = (book ==== book1).toString
+      val expected = "Book [Book(Odisea) not equal to Book(Moby-Dick)]"
       assert(result === expected)
 
+      val result2 = (book ==== book2).toString
+      val expected2 = "Book [[...]]"
+      assert(result2 === expected2)
     }
     "should print a List" in {
       val rest0 = Restaurant("Mamma mia", List("canelloni", "pizza", "gnoqui", "spaghetti").map(Dish(_, 10.0)))
       val rest1 = Restaurant("Piazza", List("canelloni", "pizza", "gnoqui", "farfalle").map(Dish(_, 10.0)))
       val rest2 = Restaurant("Mamma mia", List("sandwitch", "hotdog").map(Dish(_, 2.0)))
-      val rest3 = Restaurant("Large", ('a' to 'z').toList.map(_.toString).map(Dish(_, 3.0)))
-      val rest4 = Restaurant("Large", ('a' to 'z').toList.reverse.map(_.toString).map(Dish(_, 3.0)))
+      val rest3 = Restaurant("Vapiano", ('a' to 'z').toList.map(_.toString).map(Dish(_, 3.0)))
+      val rest4 = Restaurant("Vapiano", ('a' to 'z').toList.reverse.map(_.toString).map(Dish(_, 3.0)))
 
       val result = (rest0 ==== rest0).toString
       val expected =
         s"""✔ Restaurant
-           |       ├── ✔ name: String
+           |       ├── ✔ name: String [Mamma mia]
            |       └── ✔ menu: List
            |                     ├── ✔ 0: Dish
-           |                     │          ├── ✔ name: String
-           |                     │          └── ✔ price: Double
+           |                     │          ├── ✔ name: String [canelloni]
+           |                     │          └── ✔ price: Double [10.0]
            |                     ├── ✔ 1: Dish
-           |                     │          ├── ✔ name: String
-           |                     │          └── ✔ price: Double
+           |                     │          ├── ✔ name: String [pizza]
+           |                     │          └── ✔ price: Double [10.0]
            |                     ├── ✔ 2: Dish
-           |                     │          ├── ✔ name: String
-           |                     │          └── ✔ price: Double
+           |                     │          ├── ✔ name: String [gnoqui]
+           |                     │          └── ✔ price: Double [10.0]
            |                     └── ✔ 3: Dish
-           |                                ├── ✔ name: String
-           |                                └── ✔ price: Double""".stripMargin
+           |                                ├── ✔ name: String [spaghetti]
+           |                                └── ✔ price: Double [10.0]""".stripMargin
       assert(result === expected)
 
       val result1 = (rest0 ==== rest1).toString
@@ -119,37 +125,37 @@ class CTreePrinterSpec extends FreeSpec {
            |       ├── ✕ name: String [Mamma mia not equal to Piazza]
            |       └── ✕ menu: List
            |                     ├── ✔ 0: Dish
-           |                     │          ├── ✔ name: String
-           |                     │          └── ✔ price: Double
+           |                     │          ├── ✔ name: String [canelloni]
+           |                     │          └── ✔ price: Double [10.0]
            |                     ├── ✔ 1: Dish
-           |                     │          ├── ✔ name: String
-           |                     │          └── ✔ price: Double
+           |                     │          ├── ✔ name: String [pizza]
+           |                     │          └── ✔ price: Double [10.0]
            |                     ├── ✔ 2: Dish
-           |                     │          ├── ✔ name: String
-           |                     │          └── ✔ price: Double
+           |                     │          ├── ✔ name: String [gnoqui]
+           |                     │          └── ✔ price: Double [10.0]
            |                     └── ✕ 3: Dish
            |                                ├── ✕ name: String [spaghetti not equal to farfalle]
-           |                                └── ✔ price: Double""".stripMargin
+           |                                └── ✔ price: Double [10.0]""".stripMargin
       assert(result1 === expected1)
 
       val result2 = (rest0 ==== rest2).toString
       val expected2 =
         s"""✕ Restaurant
-           |       ├── ✔ name: String
+           |       ├── ✔ name: String [Mamma mia]
            |       └── ✕ menu: List [Left contains 4 elements and right contains 2]""".stripMargin
       assert(result2 === expected2)
 
       val result3 = (rest3 ==== rest3).toString
       val expected3 =
         s"""✔ Restaurant
-           |       ├── ✔ name: String
+           |       ├── ✔ name: String [Vapiano]
            |       └── ✔ menu: List (too large)""".stripMargin
       assert(result3 === expected3)
 
       val result4 = (rest3 ==== rest4).toString
       val expected4 =
         s"""✕ Restaurant
-           |       ├── ✔ name: String
+           |       ├── ✔ name: String [Vapiano]
            |       └── ✕ menu: List (too large: 26 elements are not equal)""".stripMargin
       assert(result4 === expected4)
     }
@@ -161,8 +167,8 @@ class CTreePrinterSpec extends FreeSpec {
       val expected =
         s"""✕ Conference
            |       └── ✕ assistants: Vector
-           |                            ├── ✔ 0: String
-           |                            ├── ✔ 1: String
+           |                            ├── ✔ 0: String [John]
+           |                            ├── ✔ 1: String [Adam]
            |                            └── ✕ 2: String [Sam not equal to Amanda]""".stripMargin
       assert(result === expected)
     }
@@ -181,14 +187,14 @@ class CTreePrinterSpec extends FreeSpec {
            |    ├── ✔ category: OneHundredMeters
            |    └── ✔ runners: Set
            |                    ├── ✔ : Runner
-           |                    │          ├── ✔ name: String
-           |                    │          └── ✔ country: String
+           |                    │          ├── ✔ name: String [Alice]
+           |                    │          └── ✔ country: String [UK]
            |                    ├── ✔ : Runner
-           |                    │          ├── ✔ name: String
-           |                    │          └── ✔ country: String
+           |                    │          ├── ✔ name: String [Annabel]
+           |                    │          └── ✔ country: String [South Africa]
            |                    └── ✔ : Runner
-           |                               ├── ✔ name: String
-           |                               └── ✔ country: String""".stripMargin
+           |                               ├── ✔ name: String [Lauren]
+           |                               └── ✔ country: String [USA]""".stripMargin
       assert(result === expected)
 
       val result1 = (race0 ==== race1).toString
@@ -197,8 +203,8 @@ class CTreePrinterSpec extends FreeSpec {
           |    ├── ✔ category: OneHundredMeters
           |    └── ✔ runners: Set [missing elements]
           |                              └── ✔ : Runner
-          |                                         ├── ✔ name: String
-          |                                         └── ✔ country: String""".stripMargin
+          |                                         ├── ✔ name: String [Lauren]
+          |                                         └── ✔ country: String [USA]""".stripMargin
       assert(result1 === expected1)
 
       val result2 = (race0 ==== race2).toString
@@ -207,6 +213,51 @@ class CTreePrinterSpec extends FreeSpec {
           |    ├── ✕ category: [OneHundredMeters$ expected but TwoHundredMeters$ found]
           |    └── ✕ runners: Set (too large: 29 elements are not equal)""".stripMargin
       assert(result2 === expected2)
+    }
+
+    "should print a Map" in {
+      val postgresConfig0: Configuration = PostgresConfig(properties = List("A", "B"))
+      val postgresConfig1: Configuration = PostgresConfig(properties = List("A", "C"))
+      val kafkaConfig0: Configuration = KafkaConfig(properties = List("A", "C"))
+      val kafkaConfig1: Configuration = KafkaConfig(properties = List("A", "C"))
+      val configurations0 = Configurations(file = new File("/Users/user/.config/configurations.conf"), values = Map(
+        "postgres" -> postgresConfig0,
+        "kafka" -> kafkaConfig0,
+      ))
+      val configurations1 = Configurations(file = new File("/Users/user/.config/configurations2.conf"), values = Map(
+        "postgres" -> postgresConfig1,
+        "kafka" -> kafkaConfig1,
+      ))
+
+      val result = (configurations0 ==== configurations0).toString
+      val expected =
+        """✔ Configurations
+          |         ├── ✔ file: File [/Users/user/.config/configurations.conf]
+          |         └── ✔ values: Map
+          |                        ├── ✔ postgres: PostgresConfig
+          |                        │                      └── ✔ properties: List
+          |                        │                                          ├── ✔ 0: String [A]
+          |                        │                                          └── ✔ 1: String [B]
+          |                        └── ✔ kafka: KafkaConfig
+          |                                          └── ✔ properties: List
+          |                                                              ├── ✔ 0: String [A]
+          |                                                              └── ✔ 1: String [C]""".stripMargin
+      assert(result === expected)
+
+      val result1 = (configurations0 ==== configurations1).toString
+      val expected1 =
+        """✕ Configurations
+          |         ├── ✕ file: File [/Users/user/.config/configurations.conf not equal to /Users/user/.config/configurations2.conf]
+          |         └── ✕ values: Map
+          |                        ├── ✕ postgres: PostgresConfig
+          |                        │                      └── ✕ properties: List
+          |                        │                                          ├── ✔ 0: String [A]
+          |                        │                                          └── ✕ 1: String [B not equal to C]
+          |                        └── ✔ kafka: KafkaConfig
+          |                                          └── ✔ properties: List
+          |                                                              ├── ✔ 0: String [A]
+          |                                                              └── ✔ 1: String [C]""".stripMargin
+      assert(result1 === expected1)
     }
   }
 }

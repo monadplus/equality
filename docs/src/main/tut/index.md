@@ -8,7 +8,7 @@ To use equality in an existing SBT project with Scala 2.12, add the following de
 ```scala
 resolvers += Resolver.bintrayRepo("io-monadplus", "maven")
 
-libraryDependencies += "io.monadplus" %% "equality-core" % "0.1"
+libraryDependencies += "io.monadplus" %% "equality-core" % "0.0.1"
 ```
 ## Example
 Equality is thought to be used with [scalatest](http://www.scalatest.org/) for testing

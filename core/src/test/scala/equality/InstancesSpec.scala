@@ -15,10 +15,10 @@ class InstancesSpec extends FreeSpec {
       val some2: Option[Int] = Some(2)
 
       val result0            = some ==== some
-      assert(result0 === Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = true)))))
+      assert(result0 === Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = true, "1")))))
 
       val result1            = some ==== some2
-      assert(result1 === Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = false, Some("1 not equal to 2"))))))
+      assert(result1 === Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = false, "1 not equal to 2")))))
     }
 
   "List" - {
@@ -28,7 +28,7 @@ class InstancesSpec extends FreeSpec {
 
       val result           = list1 ==== list2
       val error = "Left contains 0 elements and right contains 100"
-      val expected = equality.Primitive("List", isEqual = false, Some(error))
+      val expected = equality.Primitive("List", isEqual = false, content = error)
       assert(result === expected)
     }
 
@@ -40,9 +40,9 @@ class InstancesSpec extends FreeSpec {
 
       val result                   = list1 ==== list2
       val expected = Named("List", List(
-        "0" -> Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = true)))),
+        "0" -> Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = true, content = "1")))),
         "1" -> Coproduct("None", CUnit),
-        "2" -> Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = false, Some("2 not equal to 3"))))),
+        "2" -> Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = false, content = "2 not equal to 3")))),
         "3" -> Mismatch("None$ expected but Some found"),
       ))
       assert(result === expected)

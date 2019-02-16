@@ -9,7 +9,7 @@ case object CUnit extends CTree {
   override def isEqual: Boolean = true
 }
 
-case class Primitive(className: String, isEqual: Boolean, error: Option[String] = None) extends CTree
+case class Primitive(className: String, isEqual: Boolean, content: String) extends CTree
 case class Mismatch(reason: String) extends CTree {
   val isEqual: Boolean = false
 }

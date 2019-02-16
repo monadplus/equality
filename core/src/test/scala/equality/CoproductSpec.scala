@@ -13,7 +13,7 @@ class CoproductSpec extends FreeSpec {
       assert(
         result === Coproduct(
           "Circle",
-          Unnamed(List("radius" -> Primitive("Long", isEqual = true)))
+          Unnamed(List("radius" -> Primitive("Long", isEqual = true, "10")))
         )
       )
 
@@ -50,13 +50,13 @@ class CoproductSpec extends FreeSpec {
       assert(
         result0 === Coproduct(
           "Circle",
-          Unnamed(List("radius" -> Primitive("Long", isEqual = false, error = Some("5 not equal to 10"))))
+          Unnamed(List("radius" -> Primitive("Long", isEqual = false, content = "5 not equal to 10")))
         )
       )
       assert(
         result1 === Coproduct(
           "Circle",
-          Unnamed(List("radius" -> Primitive("Long", isEqual = false, error = Some("10 not equal to 5"))))
+          Unnamed(List("radius" -> Primitive("Long", isEqual = false, content = "10 not equal to 5")))
         )
       )
 
@@ -68,8 +68,8 @@ class CoproductSpec extends FreeSpec {
           "Rectangle",
           Unnamed(
             List(
-              "width"  -> Primitive("Long", isEqual = true),
-              "height" -> Primitive("Long", isEqual = false, error = Some("1 not equal to 2")),
+              "width"  -> Primitive("Long", isEqual = true, "1"),
+              "height" -> Primitive("Long", isEqual = false, content = "1 not equal to 2"),
             )
           )
         )

@@ -1,6 +1,6 @@
 package equality.util
 
-import java.io.Serializable
+import java.io.{File, Serializable}
 
 object TestHelper {
   // Product
@@ -58,4 +58,11 @@ object TestHelper {
   case class Runner(name: String, country: String)
   case class Race(category: Category, runners: Set[Runner])
 
+  // Map
+  sealed trait Configuration extends Serializable {
+    val properties: List[String]
+  }
+  case class PostgresConfig(properties: List[String]) extends Configuration
+  case class KafkaConfig(properties: List[String]) extends Configuration
+  case class Configurations(file: File, values: Map[String, Configuration])
 }

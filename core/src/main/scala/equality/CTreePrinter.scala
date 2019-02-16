@@ -4,6 +4,7 @@ object CTreePrinter {
   type Matrix = Map[Int, List[Char]]
   type Fields = List[(String, CTree)]
   type Offset = Int
+  val MAX_CONTENT_SIZE = 100 // characters
 
   implicit private class ListOps[A](self: List[A]) {
     def insert(a: A, at: Int): List[A] = {
@@ -50,6 +51,12 @@ object CTreePrinter {
     def addText(acc: Matrix, height: Int, text: String): Matrix =
       acc + (height -> (acc.getOrElse(height, Nil) ++ text.toList))
 
+    def primitiveContentAsString(p: Primitive): String = {
+      val Primitive(className, _, content) = p
+      val sanitized = if (content.length > MAX_CONTENT_SIZE && className != "Map") "[...]" else content
+      s"$className [$sanitized]"
+    }
+
     def loop(c: CTree, acc: Matrix, height: Int, width: Int): (Matrix, Int /*branch height*/ ) = c match {
       case Named(className, fields, force) =>
         val prefix = if (height == 0) s"${mark(c, force)} " else ""
@@ -69,9 +76,9 @@ object CTreePrinter {
       case Mismatch(reason) =>
         val text = if (height == 0) reason else s"[$reason]"
         addText(acc, height, text) -> height
-      case Primitive(className, isEqual, error) =>
-        val msg = if (!isEqual) s" [${error.get}]" else ""
-        addText(acc, height, s"$className" ++ msg) -> height
+      case p: Primitive =>
+        val text = primitiveContentAsString(p)
+        addText(acc, height, text) -> height
       case CUnit =>
         (acc, height)
     }

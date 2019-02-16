@@ -1,3 +1,16 @@
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
+TODO
 # Equality 
 [![Travis CI](https://travis-ci.org/monadplus/equality.svg?branch=master)](https://travis-ci.org/monadplus/equality) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f01edd87fcfe45fd9c7bd6e44b64e5ae)](https://app.codacy.com/app/monadplus/equality?utm_source=github.com&utm_medium=referral&utm_content=monadplus/equality&utm_campaign=Badge_Grade_Dashboard) [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/554261fd76634affb7f40b54f8b8583a)](https://www.codacy.com/app/monadplus/equality?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=monadplus/equality&amp;utm_campaign=Badge_Coverage)
 
@@ -10,7 +23,7 @@ To use equality in an existing SBT project with Scala 2.12, add the following de
 ```scala
 resolvers += Resolver.bintrayRepo("io-monadplus", "maven")
 
-libraryDependencies += "io.monadplus" %% "equality-core" % "0.1"
+libraryDependencies += "io.monadplus" %% "equality-core" % "0.0.1"
 ```
 ## Example
 Equality is thought to be used with [scalatest](http://www.scalatest.org/) for testing
@@ -52,19 +65,12 @@ implicit def nonEmptyListEq[A: Eq]: Eq[NonEmptyList[A]] = new Eq[NonEmptyList[A]
 }
 ```
 *Actually, there is no need for this particular instance as equality is clever enough to auto-derivate it.
-## Future Releases
+## Releases**
 
-__Release 0.2__  
+__Release 0.1__  
  - Microsite
- - Mima checks for binary compatibility
- - Better visualization
-```text
-✕ root (Dog)
-    ├── ✕ a (A) 
-    │      ├── ✔ a1 (String)
-    │      └── ✕ a2 (C)
-    │              └── ✕ c1 (Boolean)
-    └── ✔ b (B)
-            └── ✔ b1 (String)
-
-```
+ - Tree visualization
+ 
+ __Release 0.2__
+ - Mima check for binary BC
+ - Matryoshka for a faster compile time  

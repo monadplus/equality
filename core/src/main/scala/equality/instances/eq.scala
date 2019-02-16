@@ -1,19 +1,29 @@
 package equality.instances
 
+import java.io.File
+
 import equality.Eq._
 import equality._
 import equality.syntax.eq._
-import cats.{Eq => _, _}, cats.data._, cats.implicits._
+import cats.{Eq => _, _}
+import cats.data._
+import cats.implicits._
 
 private[equality] trait EqInstances0 extends EqInstances1 {
   private def primitive[A]: Eq[A] = instance {
     case (s1, s2) =>
       val `class` = s1.getClass.getSimpleName
-      if (s1 == s2) Primitive(`class`, isEqual = true)
-      else Primitive(`class`, isEqual = false, error = Some(s"$s1 not equal to $s2"))
+      if (s1 == s2) Primitive(`class`, isEqual = true, s1.toString)
+      else Primitive(`class`, isEqual = false, content = s"$s1 not equal to $s2")
   }
   implicit val stringEq: Eq[String]            = primitive[String]
   implicit def primitiveEq[A <: AnyVal]: Eq[A] = primitive[A]
+
+  implicit val fileEq: Eq[File] = instance { case (l, r) =>
+    val isEqual = l == r
+    val content = if(isEqual) s"${l.getAbsolutePath}" else s"${l.getAbsolutePath} not equal to ${r.getAbsolutePath}"
+    Primitive("File", isEqual, content)
+  }
 }
 
 sealed private[equality] trait EqInstances1 {
@@ -33,7 +43,7 @@ sealed private[equality] trait EqInstances1 {
       if (F.size(l) != F.size(r)) {
         Primitive(className,
                   isEqual = false,
-                  Some(s"Left contains ${F.size(l)} elements and right contains ${F.size(r)}"))
+                  s"Left contains ${F.size(l)} elements and right contains ${F.size(r)}")
       } else {
         val zipped = CommutativeApply[ZipList].product(ZipList(l.toList), ZipList(r.toList)).value
         val res = zipped.zipWithIndex.foldLeft[Named](Named(className, List.empty)) {
@@ -78,26 +88,23 @@ sealed private[equality] trait EqInstances1 {
       }
   }
 
-//  implicit def mapEq[K, V: Eq]: Eq[Map[K, V]] = instance {
-//    case (l, r) =>
-//      val lKeys = l.keySet
-//      val rKeys = r.keySet
-//      val leftDiff = lKeys diff rKeys
-//      if (leftDiff.isEmpty) {
-//        val rightDiff = rKeys diff lKeys
-//        if (rightDiff.isEmpty) {
-//          lKeys.foldLeft[Comparison](Equal) {
-//            case (acc, key) =>
-//              val next = (l(key) ==== r(key)).prependKey(key.toString)
-//              acc.combine(next)
-//          }
-//        } else {
-//          NotEqualPrimitive(s"""Left map does not contain keys: ${rightDiff.mkString(",")}""")
-//        }
-//      } else {
-//        NotEqualPrimitive(s"""Right map does not contain keys: ${leftDiff.mkString(",")}""")
-//      }
-//  }
+  implicit def mapEq[K, V: Eq]: Eq[Map[K, V]] = instance { case (l, r) =>
+    val (keysL, keysR) = (l.keySet, r.keySet)
+    val notEqualL = keysL.diff(keysR)
+    val notEqualR = keysR.diff(keysR)
+    val equal = keysL.intersect(keysR)
+    if (notEqualL.nonEmpty || notEqualR.nonEmpty) {
+      val error = s"Missing keys: ${notEqualL.map(_.toString).mkString(",")} (Left) ${notEqualR.map(_.toString).mkString(",")} (Right)"
+      Primitive("Map", isEqual = false, content = error)
+    }
+    else {
+      val res = equal.foldLeft[Named](Named("Map", List.empty)) {
+        case (acc, key) =>
+          acc.copy(fields = acc.fields :+ (key.toString -> (l(key) ==== r(key))))
+      }
+      filterLarge(res.className, res)
+    }
+  }
 }
 
 object eq extends EqInstances0

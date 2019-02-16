@@ -11,8 +11,8 @@ class ProductSpec extends FreeSpec {
       val dog    = Dog("Max", 10)
       val result = dog ==== dog
       assert(result === Named("Dog", List(
-        "name" -> Primitive("String", isEqual = true),
-        "age" -> Primitive("Integer", isEqual = true),
+        "name" -> Primitive("String", isEqual = true, content = "Max"),
+        "age" -> Primitive("Integer", isEqual = true, content = "10"),
       )))
     }
 
@@ -21,8 +21,8 @@ class ProductSpec extends FreeSpec {
       val dog1   = Dog("Bella", 8)
       val result = dog0 ==== dog1
       assert(result === Named("Dog", List(
-        "name" -> Primitive("String", isEqual = false, Some("Max not equal to Bella")),
-        "age" -> Primitive("Integer", isEqual = false, Some("10 not equal to 8")),
+        "name" -> Primitive("String", isEqual = false, content = "Max not equal to Bella"),
+        "age" -> Primitive("Integer", isEqual = false, content = "10 not equal to 8"),
       )))
     }
 
