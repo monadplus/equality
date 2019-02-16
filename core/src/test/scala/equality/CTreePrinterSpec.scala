@@ -150,8 +150,63 @@ class CTreePrinterSpec extends FreeSpec {
       val expected4 =
         s"""✕ Restaurant
            |       ├── ✔ name: String
-           |       └── ✕ menu: List (too large: 26 not equal elements)""".stripMargin
+           |       └── ✕ menu: List (too large: 26 elements are not equal)""".stripMargin
       assert(result4 === expected4)
+    }
+
+    "should print a Vector" in {
+      val conference0 = Conference(assistants = Vector("John", "Adam", "Sam"))
+      val conference1 = Conference(assistants = Vector("John", "Adam", "Amanda"))
+      val result = (conference0 ==== conference1).toString
+      val expected =
+        s"""✕ Conference
+           |       └── ✕ assistants: Vector
+           |                            ├── ✔ 0: String
+           |                            ├── ✔ 1: String
+           |                            └── ✕ 2: String [Sam not equal to Amanda]""".stripMargin
+      assert(result === expected)
+    }
+
+    "should print a Set" in {
+      val runner0 = Runner("Alice", "UK")
+      val runner1 = Runner("Annabel", "South Africa")
+      val runner2 = Runner("Lauren", "USA")
+      val race0 = Race(OneHundredMeters, runners = Set(runner0, runner1, runner2))
+      val race1 = Race(OneHundredMeters, runners = Set(runner0, runner1))
+      val race2 = Race(TwoHundredMeters, runners = ('a' to 'z').toSet.map((c: Char) => Runner(c.toString, "Dreamland")))
+
+      val result = (race0 ==== race0).toString
+      val expected =
+        s"""✔ Race
+           |    ├── ✔ category: OneHundredMeters
+           |    └── ✔ runners: Set
+           |                    ├── ✔ : Runner
+           |                    │          ├── ✔ name: String
+           |                    │          └── ✔ country: String
+           |                    ├── ✔ : Runner
+           |                    │          ├── ✔ name: String
+           |                    │          └── ✔ country: String
+           |                    └── ✔ : Runner
+           |                               ├── ✔ name: String
+           |                               └── ✔ country: String""".stripMargin
+      assert(result === expected)
+
+      val result1 = (race0 ==== race1).toString
+      val expected1 =
+        """✔ Race
+          |    ├── ✔ category: OneHundredMeters
+          |    └── ✔ runners: Set [missing elements]
+          |                              └── ✔ : Runner
+          |                                         ├── ✔ name: String
+          |                                         └── ✔ country: String""".stripMargin
+      assert(result1 === expected1)
+
+      val result2 = (race0 ==== race2).toString
+      val expected2 =
+        """✕ Race
+          |    ├── ✕ category: [OneHundredMeters$ expected but TwoHundredMeters$ found]
+          |    └── ✕ runners: Set (too large: 29 elements are not equal)""".stripMargin
+      assert(result2 === expected2)
     }
   }
 }

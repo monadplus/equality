@@ -1,5 +1,7 @@
 package equality.util
 
+import java.io.Serializable
+
 object TestHelper {
   // Product
   case class AllPrimitives(
@@ -41,7 +43,19 @@ object TestHelper {
 
   // Value class
   case class Book(name: String) extends AnyVal
+
   // List
   case class Dish(name: String, price: Double)
   case class Restaurant(name: String, menu: List[Dish])
+
+  // Vector
+  case class Conference(assistants: Vector[String])
+
+  // Set
+  sealed trait Category extends Serializable
+  case object OneHundredMeters extends Category
+  case object TwoHundredMeters extends Category
+  case class Runner(name: String, country: String)
+  case class Race(category: Category, runners: Set[Runner])
+
 }

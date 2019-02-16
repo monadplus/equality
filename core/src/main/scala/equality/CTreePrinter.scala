@@ -12,9 +12,16 @@ object CTreePrinter {
     }
   }
 
-  private def mark(ct: CTree): String =
-    if (ct.isEqual) "✔"
-    else "✕"
+  private def mark(ct: CTree, force: Option[Boolean] = None): String = {
+    val isEqual = (b: Boolean) => if (b) "✔" else "✕"
+    force match {
+      case Some(eq) =>
+        isEqual(eq)
+      case None =>
+        isEqual(ct.isEqual)
+    }
+  }
+
 
   def print(ct: CTree): String = {
 
@@ -44,8 +51,8 @@ object CTreePrinter {
       acc + (height -> (acc.getOrElse(height, Nil) ++ text.toList))
 
     def loop(c: CTree, acc: Matrix, height: Int, width: Int): (Matrix, Int /*branch height*/ ) = c match {
-      case Named(className, fields) =>
-        val prefix = if (height == 0) s"${mark(c)} " else ""
+      case Named(className, fields, force) =>
+        val prefix = if (height == 0) s"${mark(c, force)} " else ""
         val next = addText(acc, height, prefix ++ className)
         tree(next, fields, height, width + prefix.length + (className.length / 2))
       case Unnamed(fields) =>
@@ -53,7 +60,7 @@ object CTreePrinter {
       case Large(className, _, ne) =>
         val text: String =
           if (ne.isEmpty) s"$className (too large)"
-          else s"$className (too large: ${ne.length} not equal elements)"
+          else s"$className (too large: ${ne.length} elements are not equal)"
         addText(acc, height, text) -> height
       case Coproduct(className, c) =>
         val prefix = if (height == 0) mark(c) + " " else ""

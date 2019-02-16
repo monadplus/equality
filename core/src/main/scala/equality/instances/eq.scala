@@ -1,10 +1,11 @@
 package equality.instances
 
-import equality._
 import equality.Eq._
+import equality._
 import equality.syntax.eq._
+import cats.{Eq => _, _}, cats.data._, cats.implicits._
 
-private[equality] trait EqInstances0 extends EqInstances1{
+private[equality] trait EqInstances0 extends EqInstances1 {
   private def primitive[A]: Eq[A] = instance {
     case (s1, s2) =>
       val `class` = s1.getClass.getSimpleName
@@ -15,84 +16,68 @@ private[equality] trait EqInstances0 extends EqInstances1{
   implicit def primitiveEq[A <: AnyVal]: Eq[A] = primitive[A]
 }
 
- private[equality] sealed trait EqInstances1 {
+sealed private[equality] trait EqInstances1 {
 
-   implicit def listEq[A: Eq]: Eq[List[A]] = instance {
-     case (l, r) =>
-       if (l.length != r.length) {
-         Primitive("List", isEqual = false, Some(s"Left contains ${l.length} elements and right contains ${r.length}"))
-       }
-       else {
-         val res =  l.zip(r).zipWithIndex.foldLeft[Named](Named("List", List.empty)) {
-           case (acc, ((l, r), index)) =>
-             acc.copy(fields = acc.fields :+ (index.toString -> (l ==== r)))
-         }
-         if (res.fields.length > 10) {
-           val (eq , neq) = res.fields.partition(_._2.isEqual)
-           Large(res.className, eq, neq)
-         } else res
-       }
-   }
- }
+  // A collection is considered large when it has more than 10 elements
+  private val LARGE = 10
 
+  def filterLarge(className: String, ct: Product): CTree = {
+    if (ct.fields.length > LARGE) {
+      val (eq, neq) = ct.fields.partition(_._2.isEqual)
+      Large(className, eq, neq)
+    } else ct
+  }
 
-//
-//  implicit def listEq[A: Eq]: Eq[List[A]] = instance {
-//    case (l, r) =>
+  implicit def seqEq[F[_], A: Eq](className: String = "Seq")(implicit F: Foldable[F]): Eq[F[A]] = instance[F[A]] {
+    case (l, r) =>
+      if (F.size(l) != F.size(r)) {
+        Primitive(className,
+                  isEqual = false,
+                  Some(s"Left contains ${F.size(l)} elements and right contains ${F.size(r)}"))
+      } else {
+        val zipped = CommutativeApply[ZipList].product(ZipList(l.toList), ZipList(r.toList)).value
+        val res = zipped.zipWithIndex.foldLeft[Named](Named(className, List.empty)) {
+          case (acc, ((l, r), index)) =>
+            acc.copy(fields = acc.fields :+ (index.toString -> (l.asInstanceOf[A] ==== r.asInstanceOf[A])))
+        }
+        filterLarge(res.className, res)
+      }
+  }
 
-//  }
-//
-//  implicit def seqEq[A: Eq]: Eq[Seq[A]] = instance {
-//    case (l, r) =>
-//      if (l.length != r.length)
-//        NotEqualPrimitive(s"${l.length} elements expected but ${r.length} found")
-//      else
-//        l.zip(r).zipWithIndex.foldLeft[Comparison](Equal) {
-//          case (acc, ((l, r), index)) =>
-//            val next: Comparison = (l ==== r).prependIndex(index)
-//            acc.combine(next)
-//        }
-//  }
-//
-//  /** seqEq is not inferir Vector[A] */
-//  implicit def vectorEq[A: Eq]: Eq[Vector[A]] = instance {
-//    case (l, r) =>
-//      if (l.length != r.length)
-//        NotEqualPrimitive(s"${l.length} elements expected but ${r.length} found")
-//      else
-//        l.zip(r).zipWithIndex.foldLeft[Comparison](Equal) {
-//          case (acc, ((l, r), index)) =>
-//            val next: Comparison = (l ==== r).prependIndex(index)
-//            acc.combine(next)
-//        }
-//  }
-//
-//  // import cats.data._
-//  // implicit def nonEmptyListEq[A: Eq]: Eq[NonEmptyList[A]] = new Eq[NonEmptyList[A]] {
-//  //   override def compare(x: NonEmptyList[A], y: NonEmptyList[A]) = {
-//  //     val head = (x.head ==== y.head).prependField("head")
-//  //     val tail = (x.tail ==== y.tail).prependField("tail")
-//  //     head.combine(tail)
-//  //   }
-//  // }
-//
-//
-// TODO represent set as an Named collection where elemts have empty field name
-//  implicit def setEq[A: Eq]: Eq[Set[A]] = instance {
-//    case (l, r) =>
-//      val leftDiff = l.diff(r)
-//      if (leftDiff.isEmpty) {
-//        val rightDiff = r.diff(l)
-//        if (rightDiff.isEmpty) {
-//          Equal
-//        } else {
-//          NotEqualPrimitive(s"""Left set does not contain: ${rightDiff.mkString(",")}""")
-//        }
-//      } else {
-//        NotEqualPrimitive(s"""Right set does not contain: ${leftDiff.mkString(",")}""")
-//      }
-//  }
-//
+  implicit def listEq[A: Eq]: Eq[List[A]] =
+    seqEq[List, A]("List")
+
+  implicit def vectorEq[A: Eq]: Eq[Vector[A]] =
+    seqEq[Vector, A]("Vector")
+
+  implicit def setEq[A: Eq]: Eq[Set[A]] = instance {
+    case (l, r) =>
+      val notEqualL = l.diff(r)
+      val notEqualR = r.diff(l)
+      val equal = r.intersect(l)
+      def f[F[_]: Functor](fa: F[A]): F[(String, CTree)] =
+        fa.map(a => "" -> (a ==== a))
+      if (notEqualL.nonEmpty || notEqualR.nonEmpty) {
+        if (notEqualL.size + notEqualR.size > LARGE) {
+          Large("Set", equal = f(equal.toList), notEqual = f(notEqualL.toList ++ notEqualR.toList))
+        }
+        else {
+          Named(
+            className = "Set [missing elements]",
+            fields = (notEqualL.toList ++ notEqualR.toList).map(a => "" -> (a ==== a)),
+            force = Some(false))
+        }
+      }
+      else {
+        val res = equal.foldLeft[Named](Named("Set", List.empty)) {
+          case (acc, next) =>
+            // Comparing with itself to print a representation of the class
+            acc.copy(fields = acc.fields :+ ("" -> (next ==== next)))
+        }
+        filterLarge(res.className, res)
+      }
+  }
+
 //  implicit def mapEq[K, V: Eq]: Eq[Map[K, V]] = instance {
 //    case (l, r) =>
 //      val lKeys = l.keySet
@@ -113,5 +98,6 @@ private[equality] trait EqInstances0 extends EqInstances1{
 //        NotEqualPrimitive(s"""Right map does not contain keys: ${leftDiff.mkString(",")}""")
 //      }
 //  }
-//}
+}
+
 object eq extends EqInstances0
