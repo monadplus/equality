@@ -56,7 +56,7 @@ object Eq {
       case (Inl(h), Inl(h2)) =>
         val tree = hEq.value.compare(h, h2) match {
           case Named(_, fields, _) => Unnamed(fields)
-          case id               => id
+          case id                  => id
         }
         Coproduct(witness.value.name, tree)
       case (Inr(t), Inr(t2)) =>

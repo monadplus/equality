@@ -8,7 +8,6 @@ lazy val commonDependencies = Seq(
   "com.chuusai"   %% "shapeless" % shapelessVersion,
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.scalatest" %% "scalatest" % scalaTestVersion,
-  "org.scalactic" %% "scalactic" % scalaTestVersion % Test
 )
 
 lazy val compilerFlags = Seq(
@@ -78,6 +77,36 @@ lazy val coverageSettings =
     coverageFailOnMinimum := true
   )
 
+lazy val micrositeSettings = Seq(
+  micrositeName := "equality",
+  micrositeDescription := "Better triple equals",
+  micrositeAuthor := "Arnau Abella",
+  micrositeGithubOwner := "monadplus",
+  micrositeGithubRepo := "equality",
+  micrositeBaseUrl := "/equality",
+  micrositeDocumentationUrl := "https://monadplus.github.io/equality",
+  micrositeFooterText := None,
+  micrositeHighlightTheme := "atom-one-light",
+  micrositePalette := Map(
+    "brand-primary" -> "#3e5b95",
+    "brand-secondary" -> "#294066",
+    "brand-tertiary" -> "#2d5799",
+    "gray-dark" -> "#49494B",
+    "gray" -> "#7B7B7E",
+    "gray-light" -> "#E5E5E6",
+    "gray-lighter" -> "#F4F3F4",
+    "white-color" -> "#FFFFFF"
+  ),
+  fork in tut := true,
+  scalacOptions in Tut --= Seq(
+    "-Xfatal-warnings",
+    "-Ywarn-unused-import"
+  ),
+  libraryDependencies += "com.47deg" %% "github4s" % "0.19.0",
+  micrositePushSiteWith := GitHub4s,
+  micrositeGithubToken := sys.env.get("GITHUB_TOKEN")
+)
+
 lazy val equality = project
   .in(file("."))
   .aggregate(
@@ -97,10 +126,9 @@ lazy val core = project
 
 lazy val docs = project
   .in(file("docs"))
-  .settings(commonSettings)
   .settings(noPublishSettings)
-  .settings(
-    skip in publish := true
-  )
+  .settings(micrositeSettings)
+  .settings(commonSettings)
+  .enablePlugins(MicrositesPlugin)
   .enablePlugins(TutPlugin)
   .dependsOn(core)

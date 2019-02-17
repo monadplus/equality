@@ -9,10 +9,10 @@ trait EqSyntax {
 }
 
 final class EqOps[A](self: A)(implicit eq: Eq[A]) {
-  def ====(other: A): CTree =
+  def =><=(other: A): CTree =
     eq.compare(self, other)
 
-  def ===!(other: A): Assertion = {
+  def ====(other: A): Assertion = {
     val c = eq.compare(self, other)
     if (c.isEqual) Assertions.succeed
     else Assertions.fail(c.toString)

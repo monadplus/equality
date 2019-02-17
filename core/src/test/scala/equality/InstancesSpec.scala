@@ -6,7 +6,7 @@ import org.scalatest.FreeSpec
 class InstancesSpec extends FreeSpec {
   "Option" - {
     "should compare None" in {
-      val result = None ==== None
+      val result = None =><= None
       assert(result === CUnit)
     }
 
@@ -14,40 +14,49 @@ class InstancesSpec extends FreeSpec {
       val some: Option[Int]  = Some(1)
       val some2: Option[Int] = Some(2)
 
-      val result0            = some ==== some
+      val result0 = some =><= some
       assert(result0 === Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = true, "1")))))
 
-      val result1            = some ==== some2
-      assert(result1 === Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = false, "1 not equal to 2")))))
+      val result1 = some =><= some2
+      assert(
+        result1 === Coproduct("Some",
+                              Unnamed(List("value" -> Primitive("Integer", isEqual = false, "1 not equal to 2"))))
+      )
     }
 
-  "List" - {
-    "should compare list of different sizes" in {
-      val list1: List[Int] = Nil
-      val list2: List[Int] = (1 to 100).toList
+    "List" - {
+      "should compare list of different sizes" in {
+        val list1: List[Int] = Nil
+        val list2: List[Int] = (1 to 100).toList
 
-      val result           = list1 ==== list2
-      val error = "Left contains 0 elements and right contains 100"
-      val expected = equality.Primitive("List", isEqual = false, content = error)
-      assert(result === expected)
+        val result   = list1 =><= list2
+        val error    = "Left contains 0 elements and right contains 100"
+        val expected = equality.Primitive("List", isEqual = false, content = error)
+        assert(result === expected)
+      }
+
+      "should compare list of the same size" in {
+        import cats.implicits._
+
+        val list1: List[Option[Int]] = List(1.some, none, 2.some, none)
+        val list2: List[Option[Int]] = List(1.some, none, 3.some, 4.some)
+
+        val result = list1 =><= list2
+        val expected = Named(
+          "List",
+          List(
+            "0" -> Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = true, content = "1")))),
+            "1" -> Coproduct("None", CUnit),
+            "2" -> Coproduct(
+              "Some",
+              Unnamed(List("value" -> Primitive("Integer", isEqual = false, content = "2 not equal to 3")))
+            ),
+            "3" -> Mismatch("None$ expected but Some found"),
+          )
+        )
+        assert(result === expected)
+      }
     }
-
-    "should compare list of the same size" in {
-      import cats.implicits._
-
-      val list1: List[Option[Int]] = List(1.some, none, 2.some, none)
-      val list2: List[Option[Int]] = List(1.some, none, 3.some, 4.some)
-
-      val result                   = list1 ==== list2
-      val expected = Named("List", List(
-        "0" -> Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = true, content = "1")))),
-        "1" -> Coproduct("None", CUnit),
-        "2" -> Coproduct("Some", Unnamed(List("value" -> Primitive("Integer", isEqual = false, content = "2 not equal to 3")))),
-        "3" -> Mismatch("None$ expected but Some found"),
-      ))
-      assert(result === expected)
-    }
-  }
 //  TODO
 //
 //  "Vector" - {

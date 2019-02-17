@@ -23,7 +23,6 @@ object CTreePrinter {
     }
   }
 
-
   def print(ct: CTree): String = {
 
     def tree(curr: Matrix, fields: Fields, height: Int, width: Int): (Matrix, Int) = {
@@ -31,7 +30,7 @@ object CTreePrinter {
       val whitespaces = " " * width
       fields.zipWithIndex.foldLeft[(Matrix, Int)]((curr, height)) {
         case ((acc, h), ((fieldName, field), index)) =>
-          val height = h + 1 /*next line*/
+          val height             = h + 1 /*next line*/
           val text               = whitespaces ++ s"${prefix(index)} ${mark(field)} $fieldName: "
           val matrix: Matrix     = acc + (height -> text.toList)
           val (matrix2, height2) = loop(field, matrix, height, text.length)
@@ -53,14 +52,14 @@ object CTreePrinter {
 
     def primitiveContentAsString(p: Primitive): String = {
       val Primitive(className, _, content) = p
-      val sanitized = if (content.length > MAX_CONTENT_SIZE && className != "Map") "[...]" else content
+      val sanitized                        = if (content.length > MAX_CONTENT_SIZE && className != "Map") "[...]" else content
       s"$className [$sanitized]"
     }
 
     def loop(c: CTree, acc: Matrix, height: Int, width: Int): (Matrix, Int /*branch height*/ ) = c match {
       case Named(className, fields, force) =>
         val prefix = if (height == 0) s"${mark(c, force)} " else ""
-        val next = addText(acc, height, prefix ++ className)
+        val next   = addText(acc, height, prefix ++ className)
         tree(next, fields, height, width + prefix.length + (className.length / 2))
       case Unnamed(fields) =>
         tree(acc, fields, height, width)

@@ -9,7 +9,7 @@ class CoproductSpec extends FreeSpec {
   "Eq on a coproduct data type" - {
     "returns Equal when both instances are equal" in {
       val circle: Shape = Circle(10)
-      val result        = circle ==== circle
+      val result        = circle =><= circle
       assert(
         result === Coproduct(
           "Circle",
@@ -17,7 +17,7 @@ class CoproductSpec extends FreeSpec {
         )
       )
 
-      val result2 = (Amorph: Shape) ==== (Amorph: Shape)
+      val result2 = (Amorph: Shape) =><= (Amorph: Shape)
       assert(result2 === Coproduct("Amorph", CUnit))
     }
 
@@ -26,17 +26,17 @@ class CoproductSpec extends FreeSpec {
       val rectangle: Shape = Rectangle(3, 4)
       val amorph: Shape    = Amorph
 
-      val result0 = circle ==== rectangle
+      val result0 = circle =><= rectangle
       assert(
         result0 === Mismatch("Circle expected but Rectangle found")
       )
 
-      val result1 = rectangle ==== circle
+      val result1 = rectangle =><= circle
       assert(
         result1 === Mismatch("Rectangle expected but Circle found")
       )
 
-      val result2 = circle ==== amorph
+      val result2 = circle =><= amorph
       assert(
         result2 === Mismatch("Circle expected but Amorph$ found")
       )
@@ -45,8 +45,8 @@ class CoproductSpec extends FreeSpec {
     "returns NotEqual when coproducts are the same terminal object but different instances" in {
       val circle0: Shape = Circle(5)
       val circle1: Shape = Circle(10)
-      val result0        = circle0 ==== circle1
-      val result1        = circle1 ==== circle0
+      val result0        = circle0 =><= circle1
+      val result1        = circle1 =><= circle0
       assert(
         result0 === Coproduct(
           "Circle",
@@ -62,7 +62,7 @@ class CoproductSpec extends FreeSpec {
 
       val rectangle0: Shape = Rectangle(width = 1, height = 1)
       val rectangle1: Shape = Rectangle(width = 1, height = 2)
-      val result2           = rectangle0 ==== rectangle1
+      val result2           = rectangle0 =><= rectangle1
       assert(
         result2 === Coproduct(
           "Rectangle",

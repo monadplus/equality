@@ -52,7 +52,7 @@ object TestHelper {
   case class Conference(assistants: Vector[String])
 
   // Set
-  sealed trait Category extends Serializable
+  sealed trait Category        extends Serializable
   case object OneHundredMeters extends Category
   case object TwoHundredMeters extends Category
   case class Runner(name: String, country: String)
@@ -63,6 +63,6 @@ object TestHelper {
     val properties: List[String]
   }
   case class PostgresConfig(properties: List[String]) extends Configuration
-  case class KafkaConfig(properties: List[String]) extends Configuration
+  case class KafkaConfig(properties: List[String])    extends Configuration
   case class Configurations(file: File, values: Map[String, Configuration])
 }

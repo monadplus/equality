@@ -26,8 +26,10 @@ sealed trait Product extends CTree {
   override def isEqual: Boolean =
     fields.forall(_._2.isEqual)
 }
-case class Unnamed(fields: List[(String, CTree)])                  extends Product
-case class Named(className: String, fields: List[(String, CTree)], force: Option[Boolean] = None) extends Product with Collection
+case class Unnamed(fields: List[(String, CTree)]) extends Product
+case class Named(className: String, fields: List[(String, CTree)], force: Option[Boolean] = None)
+    extends Product
+    with Collection
 
 case class Coproduct(className: String, tree: CTree) extends CTree {
   override def isEqual: Boolean =
