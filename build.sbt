@@ -45,7 +45,6 @@ lazy val commonSettings: Seq[Def.Setting[_]] = Seq(
   licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.html")),
   parallelExecution in Test := true,
   fork in Test := true,
-  scalafmtOnCompile := true,
   addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.2.4"),
   libraryDependencies ++= commonDependencies,
 ) ++ compilerFlags
