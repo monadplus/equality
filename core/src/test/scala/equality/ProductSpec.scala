@@ -14,7 +14,7 @@ class ProductSpec extends FreeSpec {
         result === Named("Dog",
                          List(
                            "name" -> Primitive("String", isEqual = true, content = "Max"),
-                           "age"  -> Primitive("Integer", isEqual = true, content = "10"),
+                           "age"  -> Primitive("Integer", isEqual = true, content = "10")
                          ))
       )
     }
@@ -28,7 +28,7 @@ class ProductSpec extends FreeSpec {
           "Dog",
           List(
             "name" -> Primitive("String", isEqual = false, content = "Max not equal to Bella"),
-            "age"  -> Primitive("Integer", isEqual = false, content = "10 not equal to 8"),
+            "age"  -> Primitive("Integer", isEqual = false, content = "10 not equal to 8")
           )
         )
       )

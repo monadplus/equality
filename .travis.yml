@@ -3,6 +3,7 @@ language: scala
 
 scala:
 - 2.12.8
+#- 2.11.12
 
 jdk:
 - oraclejdk8
@@ -21,7 +22,7 @@ before_install:
   - export PATH=${PATH}:./vendor/bundle
 
 install:
-  - rvm use 2.2.8 --install --fuzzy
+  - rvm use 2.6.0 --install --fuzzy
   - gem update --system
   - gem install sass
   - gem install jekyll -v 3.2.1
@@ -32,4 +33,5 @@ script:
 
 after_success:
   - sbt ++$TRAVIS_SCALA_VERSION "++$TRAVIS_SCALA_VERSION coverageReport" coverageAggregate codacyCoverage
-  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && sbt ++$TRAVIS_SCALA_VERSION publish && sbt docs/publishMicrosite
+  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && sbt ++$TRAVIS_SCALA_VERSION publish
+  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $TRAVIS_SCALA_VERSION == "2.12.8" && sbt docs/publishMicrosite

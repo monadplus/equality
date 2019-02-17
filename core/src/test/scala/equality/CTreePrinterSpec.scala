@@ -6,6 +6,18 @@ import org.scalatest.FreeSpec
 import equality.all._
 import equality.util.TestHelper._
 
+// ADT
+case class A(a: B, a1: Boolean)
+case class B(a: C, a1: String)
+case class C(a: DE, a2: Boolean, a3: Long)
+sealed trait DE
+case class D(a: FG, a1: String, a2: String) extends DE
+case object E                               extends DE
+sealed trait FG
+case class F(a: String) extends FG
+case class G(a: H)      extends FG
+case class H(a: Boolean)
+
 class CTreePrinterSpec extends FreeSpec {
 
   val dog  = Dog(name = "Max", age = 1)
@@ -223,12 +235,12 @@ class CTreePrinterSpec extends FreeSpec {
       val configurations0 = Configurations(file = new File("/Users/user/.config/configurations.conf"),
                                            values = Map(
                                              "postgres" -> postgresConfig0,
-                                             "kafka"    -> kafkaConfig0,
+                                             "kafka"    -> kafkaConfig0
                                            ))
       val configurations1 = Configurations(file = new File("/Users/user/.config/configurations2.conf"),
                                            values = Map(
                                              "postgres" -> postgresConfig1,
-                                             "kafka"    -> kafkaConfig1,
+                                             "kafka"    -> kafkaConfig1
                                            ))
 
       val result = (configurations0 =><= configurations0).toString

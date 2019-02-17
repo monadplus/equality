@@ -16,45 +16,32 @@ lazy val commonDependencies = Seq(
 
 lazy val compilerFlags = Seq(
   scalacOptions ++= Seq(
-    "-deprecation",
-    "-encoding",
-    "utf-8",
-    "-explaintypes",
     "-feature",
-    "-language:existentials",
-    "-language:higherKinds",
-    "-language:implicitConversions",
     "-deprecation",
-    "-unchecked",
-    "-Xcheckinit",
-    "-Xfatal-warnings",
-    "-Xfuture",
-    "-Yno-adapted-args",
-    "-Ypartial-unification",
-    "-Ywarn-dead-code",
-    "-Ywarn-extra-implicit",
-    "-Ywarn-inaccessible",
-    "-Ywarn-infer-any",
-    "-Ywarn-nullary-override",
-    "-Ywarn-nullary-unit",
-    "-Ywarn-numeric-widen",
-    "-Ywarn-unused:implicits",
-    "-Ywarn-unused:imports",
-    "-Ywarn-unused:locals",
-    "-Ywarn-unused:params",
-    "-Ywarn-unused:patvars",
-    "-Ywarn-unused:privates",
-    "-Ywarn-value-discard"
-  ),
+    "-language:implicitConversions",
+    "-language:higherKinds"
+  ) ++ (if (scalaBinaryVersion.value.startsWith("2.12"))
+          List(
+            "-Xlint",
+            "-Xfatal-warnings",
+            "-Yno-adapted-args",
+            "-Ywarn-value-discard",
+            "-Ywarn-unused-import",
+            "-Ypartial-unification"
+          )
+        else Nil),
   scalacOptions in (Test, compile) --= Seq(
+    "-Ywarn-unused-import",
+    "-Xlint",
     "-Xfatal-warnings"
   )
 )
 
 lazy val commonSettings: Seq[Def.Setting[_]] = Seq(
   organization := "io.monadplus",
-  name := "equality",
   scalaVersion := "2.12.8",
+//  TODO: support 2.11.12 (tests are failing)
+//  crossScalaVersions := Seq(scalaVersion.value, "2.11.12"),
   licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.html")),
   parallelExecution in Test := true,
   fork in Test := true,
@@ -65,7 +52,7 @@ lazy val commonSettings: Seq[Def.Setting[_]] = Seq(
 
 lazy val publishSettings =
   Seq(
-    publishMavenStyle := true,  
+    publishMavenStyle := true,
     bintrayOrganization := Some("io-monadplus"),
     bintrayPackage := "equality"
   )
@@ -75,7 +62,7 @@ lazy val noPublishSettings =
     skip in publish := true
   )
 
-lazy val coverageSettings = 
+lazy val coverageSettings =
   Seq(
     coverageMinimum := 70,
     coverageHighlighting := true,
@@ -93,14 +80,14 @@ lazy val micrositeSettings = Seq(
   micrositeFooterText := None,
   micrositeHighlightTheme := "atom-one-light",
   micrositePalette := Map(
-    "brand-primary" -> "#3e5b95",
+    "brand-primary"   -> "#3e5b95",
     "brand-secondary" -> "#294066",
-    "brand-tertiary" -> "#2d5799",
-    "gray-dark" -> "#49494B",
-    "gray" -> "#7B7B7E",
-    "gray-light" -> "#E5E5E6",
-    "gray-lighter" -> "#F4F3F4",
-    "white-color" -> "#FFFFFF"
+    "brand-tertiary"  -> "#2d5799",
+    "gray-dark"       -> "#49494B",
+    "gray"            -> "#7B7B7E",
+    "gray-light"      -> "#E5E5E6",
+    "gray-lighter"    -> "#F4F3F4",
+    "white-color"     -> "#FFFFFF"
   ),
   fork in tut := true,
   scalacOptions in Tut --= Seq(
@@ -122,10 +109,10 @@ lazy val equality = project
 
 lazy val core = project
   .in(file("core"))
+  .settings(name := "equality-core")
   .settings(commonSettings)
   .settings(publishSettings)
   .settings(coverageSettings)
-  .settings(name := "equality-core")
 
 lazy val docs = project
   .in(file("docs"))

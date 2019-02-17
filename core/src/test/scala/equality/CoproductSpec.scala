@@ -1,8 +1,12 @@
 package equality
 
 import equality.all._
-import equality.util.TestHelper._
 import org.scalatest.FreeSpec
+
+sealed trait Shape
+case class Circle(radius: Long)                 extends Shape
+case class Rectangle(width: Long, height: Long) extends Shape
+case object Amorph                              extends Shape
 
 class CoproductSpec extends FreeSpec {
 
@@ -69,7 +73,7 @@ class CoproductSpec extends FreeSpec {
           Unnamed(
             List(
               "width"  -> Primitive("Long", isEqual = true, "1"),
-              "height" -> Primitive("Long", isEqual = false, content = "1 not equal to 2"),
+              "height" -> Primitive("Long", isEqual = false, content = "1 not equal to 2")
             )
           )
         )

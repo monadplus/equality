@@ -51,7 +51,7 @@ class InstancesSpec extends FreeSpec {
               "Some",
               Unnamed(List("value" -> Primitive("Integer", isEqual = false, content = "2 not equal to 3")))
             ),
-            "3" -> Mismatch("None$ expected but Some found"),
+            "3" -> Mismatch("None$ expected but Some found")
           )
         )
         assert(result === expected)
