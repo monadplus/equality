@@ -32,5 +32,4 @@ script:
 
 after_success:
   - sbt ++$TRAVIS_SCALA_VERSION "++$TRAVIS_SCALA_VERSION coverageReport" coverageAggregate codacyCoverage
-  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $TRAVIS_REPO_SLUG == "monadplus/equality" && sbt
-  ++$TRAVIS_SCALA_VERSION publish && sbt docs/publishMicrosite
+  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && sbt ++$TRAVIS_SCALA_VERSION publish && sbt docs/publishMicrosite

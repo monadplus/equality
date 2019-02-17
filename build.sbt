@@ -55,6 +55,7 @@ lazy val commonSettings: Seq[Def.Setting[_]] = Seq(
   parallelExecution in Test := true,
   fork in Test := true,
   scalafmtOnCompile := true,
+  addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.2.4"),
   libraryDependencies ++= commonDependencies,
 ) ++ compilerFlags
 
@@ -79,7 +80,7 @@ lazy val coverageSettings =
 
 lazy val micrositeSettings = Seq(
   micrositeName := "equality",
-  micrositeDescription := "Better triple equals",
+  micrositeDescription := "Compare arbitrary ADTs",
   micrositeAuthor := "Arnau Abella",
   micrositeGithubOwner := "monadplus",
   micrositeGithubRepo := "equality",
@@ -100,6 +101,7 @@ lazy val micrositeSettings = Seq(
   fork in tut := true,
   scalacOptions in Tut --= Seq(
     "-Xfatal-warnings",
+    "-Ywarn-unused:imports",
     "-Ywarn-unused-import"
   ),
   libraryDependencies += "com.47deg" %% "github4s" % "0.19.0",
