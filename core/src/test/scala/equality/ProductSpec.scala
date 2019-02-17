@@ -39,8 +39,3 @@ class ProductSpec extends FreeSpec {
     }
   }
 }
-
-object Main extends App {
-  val test = new ProductSpec()
-  test.execute()
-}

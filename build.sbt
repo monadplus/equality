@@ -1,5 +1,9 @@
 resolvers in Global += Resolver.sonatypeRepo("releases")
 
+lazy val contributors = Seq(
+  "monadplus" -> "Arnau Abella"
+)
+
 lazy val shapelessVersion = "2.3.3"
 lazy val catsVersion      = "1.6.0"
 lazy val scalaTestVersion = "3.0.5"
@@ -103,10 +107,7 @@ lazy val micrositeSettings = Seq(
     "-Xfatal-warnings",
     "-Ywarn-unused:imports",
     "-Ywarn-unused-import"
-  ),
-  libraryDependencies += "com.47deg" %% "github4s" % "0.19.0",
-  micrositePushSiteWith := GitHub4s,
-  micrositeGithubToken := sys.env.get("GITHUB_TOKEN")
+  )
 )
 
 lazy val equality = project
