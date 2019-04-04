@@ -71,7 +71,7 @@ sealed private[equality] trait EqInstances1 {
           Large("Set", equal = f(equal.toList), notEqual = f(notEqualL.toList ++ notEqualR.toList))
         } else {
           Named(className = "Set [missing elements]",
-                fields = (notEqualL.toList ++ notEqualR.toList).map(a => "" -> (a =><= a)),
+                fields = f(notEqualL.toList ++ notEqualR.toList),
                 force = Some(false))
         }
       } else {
@@ -88,7 +88,7 @@ sealed private[equality] trait EqInstances1 {
     case (l, r) =>
       val (keysL, keysR) = (l.keySet, r.keySet)
       val notEqualL      = keysL.diff(keysR)
-      val notEqualR      = keysR.diff(keysR)
+      val notEqualR      = keysR.diff(keysL)
       val equal          = keysL.intersect(keysR)
       if (notEqualL.nonEmpty || notEqualR.nonEmpty) {
         val error =

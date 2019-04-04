@@ -1,9 +1,44 @@
 package equality
 
+import cats.implicits._
 import equality.all._
 import org.scalatest.FreeSpec
 
+/*
+There are two kind of checks in this spec.
+The ones using a simple `=><=`, and the inspecting the whole Ctree object.
+The latter is more robust by implies more effort.
+ */
 class InstancesSpec extends FreeSpec {
+    "Tuple" - {
+      "should compare 2-arity tuples" in {
+        val x: (Long, Boolean) = (10L, true)
+        val y: (Long, Boolean) = (11L, false)
+
+        assert((x =><= x).isEqual)
+        assert((y =><= y).isEqual)
+        assert(!(x =><= y).isEqual)
+        assert(!(y =><= x).isEqual)
+      }
+      "should compare 3-arity tuples" in {
+        val x: (Long, Boolean, String) = (10L, true, "Abc")
+        val y: (Long, Boolean, String) = (11L, false, "Abd")
+
+        assert((x =><= x).isEqual)
+        assert((y =><= y).isEqual)
+        assert(!(x =><= y).isEqual)
+        assert(!(y =><= x).isEqual)
+      }
+      "should compare 4-arity tuples" in {
+        val x: (Long, Boolean, String, Unit) = (10L, true, "Abc", ())
+        val y: (Long, Boolean, String, Unit) = (11L, false, "Abd", ())
+
+        assert((x =><= x).isEqual)
+        assert((y =><= y).isEqual)
+        assert(!(x =><= y).isEqual)
+        assert(!(y =><= x).isEqual)
+      }
+    }
   "Option" - {
     "should compare None" in {
       val result = None =><= None
@@ -24,6 +59,17 @@ class InstancesSpec extends FreeSpec {
       )
     }
 
+    "Either" - {
+      "should compare instances of Either" in {
+        val left: Either[String, Int]  = Left("y")
+        val right: Either[String, Int] = Right(0)
+
+        assert((left =><= left).isEqual)
+        assert((right =><= right).isEqual)
+        assert(!(left =><= right).isEqual)
+        assert(!(right =><= left).isEqual)
+      }
+    }
     "List" - {
       "should compare list of different sizes" in {
         val list1: List[Int] = Nil
@@ -57,122 +103,70 @@ class InstancesSpec extends FreeSpec {
         assert(result === expected)
       }
     }
-//  TODO
-//
-//  "Vector" - {
-//    "should compare vectors of different sizes" in {
-//      val vector1: Vector[Int] = Vector.empty[Int]
-//      val vector2: Vector[Int] = Vector(0)
-//
-//      val result               = vector1 ==== vector2
-//      assert(result === NotEqualPrimitive("0 elements expected but 1 found"))
-//    }
-//
-//    "should compare vectors of the same size" in {
-//      import cats.implicits._
-//
-//      val vector1: Vector[Option[Int]] = Vector(1.some, none, 2.some, none)
-//      val vector2: Vector[Option[Int]] = Vector(1.some, none, 3.some, 4.some)
-//
-//      val result                       = vector1 ==== vector2
-//      assert(
-//        result === NotEqual(
-//          Map(
-//            Index(2, Choice("Some", End)) -> "2 not equal to 3",
-//            Index(3, End)                 -> "None not equal to Some(4)"
-//          )
-//        )
-//      )
-//    }
-//  }
-//
-//  "NonEmptyList" - {
-//    "should compare nonEmptyList" in {
-//      import cats.data.NonEmptyList
-//
-//      val nel1: NonEmptyList[Char] = NonEmptyList.of('a', 'b', 'c')
-//      val nel2: NonEmptyList[Char] = NonEmptyList.of('a', 'b', 'd')
-//
-//      val result1 = nel1 ==== nel1
-//      assert(result1 === Equal)
-//
-//      val result2 = nel1 ==== nel2
-//      assert(result2 === NotEqual(Map(Field("tail", Index(1, End)) -> "c not equal to d")))
-//    }
-//  }
-//
-//  "Tuple" - {
-//    // TupleN it's just an ordinary case class
-//    "should resole an instance of Eq for 2-arity tuples" in {
-//      val x: Tuple2[Long, Boolean] = (10L, true)
-//      val y: Tuple2[Long, Boolean] = (11L, false)
-//
-//      val result0                  = x ==== x
-//      assert(result0 === Equal)
-//
-//      val result1                  = x ==== y
-//      assert(
-//        result1 === NotEqual(
-//          Map(
-//            Field("_1", End) -> "10 not equal to 11",
-//            Field("_2", End) -> "true not equal to false"
-//          )
-//        )
-//      )
-//    }
-//  }
-//
-//  "Either" - {
-//    "should resolve the instance for Either" in {
-//      val left: Either[String, Int]  = Left("y")
-//      val right: Either[String, Int] = Right(0)
-//
-//      val result0                    = left ==== left
-//      assert(result0 === Equal)
-//
-//      val result1                    = right ==== right
-//      assert(result1 === Equal)
-//
-//      val result2                    = left ==== right
-//      assert(result2 === NotEqualPrimitive("Left expected but Right found"))
-//    }
-//  }
-//
-//  "Set" - {
-//    "should resolve the instance for Set[A]" in {
-//      val set0: Set[Char] = Set('a', 'b')
-//      val set1: Set[Char] = Set('a', 'b', 'c')
-//
-//      val result0         = set0 ==== set0
-//      assert(result0 === Equal)
-//
-//      val result1         = set0 ==== set1
-//      assert(result1 === NotEqualPrimitive("Left set does not contain: c"))
-//
-//      val result2         = set1 ==== set0
-//      assert(result2 === NotEqualPrimitive("Right set does not contain: c"))
-//    }
-//  }
-//
-//  "Map" - {
-//    "should resolve the instance for Map[K, V]" in {
-//      val map0: Map[String, Int] = Map("cat" -> 3, "dog" -> 4)
-//      val map1: Map[String, Int] = Map("cat" -> 3)
-//      val map2: Map[String, Int] = Map("cat" -> 3, "dog" -> 5)
-//
-//      val result0 = map0 ==== map0
-//      assert(result0 === Equal)
-//
-//      val result1 = map0 ==== map1
-//      assert(result1 === NotEqualPrimitive("Right map does not contain keys: dog"))
-//
-//      val result2 = map1 ==== map0
-//      assert(result2 === NotEqualPrimitive("Left map does not contain keys: dog"))
-//
-//      val result3 = map0 ==== map2
-//      assert(result3 === NotEqual(Map(
-//          Key("dog", End) -> "4 not equal to 5"
-//      )))
-//    }
+
+    "Set" - {
+      "should compare an empty set with a singleton set" in {
+        val set0 = Set.empty[Char]
+        val set1 = Set('a')
+        // commutativity
+        assert((set0 =><= set0).isEqual)
+        assert(!(set0 =><= set1).isEqual)
+        assert(!(set1 =><= set0).isEqual)
+      }
+      "should compare sets of different size" in {
+        def generate(size: Int) = List.iterate(0, size)(_ + 1).toSet
+        val set0 = generate(10)
+        val set1 = generate(100)
+
+        assert((set0 =><= set0).isEqual)
+        assert((set1 =><= set1).isEqual)
+
+        assert(!(set0 =><= set1).isEqual)
+        assert(!(set1 =><= set0).isEqual)
+      }
+    }
+    "Map" - {
+      "should compare an empty Map with a singleton Map" in {
+        val map0 = Map.empty[String, Int]
+        val map1 = Map("x" -> 0)
+        // commutativity
+        assert((map0 =><= map0).isEqual)
+        assert(!(map0 =><= map1).isEqual)
+        assert(!(map1 =><= map0).isEqual)
+      }
+      "should compare sets of different size" in {
+        def generate(size: Int) = List.iterate(0, size)(_ + 1).map(i => i.toString -> i).toMap
+        val map0 = generate(10)
+        val map1 = generate(100)
+
+        assert((map0 =><= map0).isEqual)
+        assert((map1 =><= map1).isEqual)
+
+        assert(!(map0 =><= map1).isEqual)
+        assert(!(map1 =><= map0).isEqual)
+      }
+    }
+
+    "Vector" - {
+      "should compare vectors of different sizes" in {
+        val vector1: Vector[Int] = Vector.empty[Int]
+        val vector2: Vector[Int] = Vector(0)
+
+        assert((vector1 =><= vector1).isEqual)
+        assert((vector2 =><= vector2).isEqual)
+        assert(!(vector1 =><= vector2).isEqual)
+        assert(!(vector2 =><= vector1).isEqual)
+      }
+
+      "should compare vectors of the same size" in {
+        val vector1: Vector[Option[Int]] = Vector(1.some, none, 2.some, none)
+        val vector2: Vector[Option[Int]] = Vector(1.some, none, 3.some, 4.some)
+
+        assert((vector1 =><= vector1).isEqual)
+        assert((vector2 =><= vector2).isEqual)
+        assert(!(vector1 =><= vector2).isEqual)
+        assert(!(vector2 =><= vector1).isEqual)
+      }
+    }
   }
 }
