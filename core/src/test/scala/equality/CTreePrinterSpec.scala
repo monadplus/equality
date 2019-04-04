@@ -209,11 +209,12 @@ class CTreePrinterSpec extends FreeSpec {
            |                               └── ✔ country: String [USA]""".stripMargin
       assert(result === expected)
 
+      // TODO: broken
       val result1 = (race0 =><= race1).toString
       val expected1 =
-        """✔ Race
+        """✕ Race
           |    ├── ✔ category: OneHundredMeters
-          |    └── ✔ runners: Set [missing elements]
+          |    └── ✕ runners: Set [missing elements]
           |                              └── ✔ : Runner
           |                                         ├── ✔ name: String [Lauren]
           |                                         └── ✔ country: String [USA]""".stripMargin
