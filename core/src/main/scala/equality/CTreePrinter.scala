@@ -1,5 +1,7 @@
 package equality
 
+import org.scalactic.source.Position
+
 object CTreePrinter {
   type Matrix = Map[Int, List[Char]]
   type Fields = List[(String, CTree)]
@@ -23,7 +25,7 @@ object CTreePrinter {
     }
   }
 
-  def print(ct: CTree): String = {
+  def print(ct: CTree)(implicit pos: Position): String = {
 
     def tree(curr: Matrix, fields: Fields, height: Int, width: Int): (Matrix, Int) = {
       val prefix      = (idx: Int) => if (idx == fields.length - 1) "└──" else "├──"
@@ -82,6 +84,13 @@ object CTreePrinter {
         (acc, height)
     }
 
-    loop(ct, Map.empty, 0, 0)._1.toList.sortBy(_._1).map(_._2.mkString("")).mkString("\n")
+    val body = loop(ct, Map.empty, 0, 0)._1.toList.sortBy(_._1).map(_._2.mkString("")).mkString("\n")
+
+    Option(pos) match {
+      case None =>
+        body
+      case Some(p) =>
+        body + s".(${p.fileName}:${p.lineNumber})"
+    }
   }
 }

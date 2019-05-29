@@ -1,8 +1,11 @@
 package equality
 
+import org.scalactic.source.Position
+
 sealed trait CTree extends Serializable {
   def isEqual: Boolean
-  override def toString: String = CTreePrinter.print(this)
+  def toString(pos: Position): String = CTreePrinter.print(this)(pos)
+  override def toString: String = CTreePrinter.print(this)(null)
 }
 
 case object CUnit extends CTree {

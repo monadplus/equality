@@ -1,6 +1,7 @@
 package equality.syntax
 
 import equality._
+import org.scalactic.source.Position
 import org.scalatest._
 
 trait EqSyntax {
@@ -12,10 +13,10 @@ final class EqOps[A](self: A)(implicit eq: Eq[A]) {
   def =><=(other: A): CTree =
     eq.compare(self, other)
 
-  def ====(other: A): Assertion = {
+  def ====(other: A)(implicit pos: Position): Assertion = {
     val c = eq.compare(self, other)
     if (c.isEqual) Assertions.succeed
-    else Assertions.fail(c.toString)
+    else Assertions.fail(c.toString(pos))
   }
 }
 
